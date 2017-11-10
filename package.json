@@ -4,7 +4,7 @@
   "description": "## useful articles",
   "main": "./front/app.ts",
   "scripts": {
-    "start": "webpack"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
