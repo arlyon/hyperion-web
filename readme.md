@@ -5,6 +5,7 @@
 - [React Component Patterns](https://medium.com/gitconnected/react-component-patterns-ab1f09be2c82)
 - [Django Channels (live webpages with WebSockets)](https://www.ploggingdev.com/2017/11/building-a-chat-room-using-django-channels/)
 - [Front end checklist](https://github.com/thedaviddias/Front-End-Checklist)
+- [HTTP For Humans](http://docs.python-requests.org/en/latest/index.html)
 
 ## ideas
 
