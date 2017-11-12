@@ -6,6 +6,7 @@
 - [Django Channels (live webpages with WebSockets)](https://www.ploggingdev.com/2017/11/building-a-chat-room-using-django-channels/)
 - [Front end checklist](https://github.com/thedaviddias/Front-End-Checklist)
 - [HTTP For Humans](http://docs.python-requests.org/en/latest/index.html)
+- [JSON Decode](http://docs.python-guide.org/en/latest/scenarios/json/)
 
 ## ideas
 
