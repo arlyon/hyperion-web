@@ -30,13 +30,12 @@ export const Person = (props: IPerson) =>
     <article>
         <h1>{props.name}</h1>
         <dl>
-            <dt>Born</dt>
+            <dt>Born at</dt>
             <dd>{props.birthday}</dd>
             <dt>Relative</dt>
             <dd>{props.is_relative.toString()}</dd>
         </dl>
     </article>;
-
 
 /**
  * A class-based component.

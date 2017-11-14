@@ -17,8 +17,8 @@ export class People extends React.Component<{}, PeopleState> {
     /**
      * Called when the component is instantiated.
      */
-    constructor() {
-        super();
+    constructor(props: {}) {
+        super(props);
 
         // set the state
         this.state = {
@@ -47,9 +47,7 @@ export class People extends React.Component<{}, PeopleState> {
      * @returns {any}
      */
     render() {
-        const people = this.state.people.map(person => {
-            return <Person key={person.id} {...person} />
-        });
+        const people = this.state.people.map(person => <Person key={person.id} {...person} />);
 
         return (
             <section>
