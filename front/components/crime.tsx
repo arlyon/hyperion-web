@@ -76,12 +76,15 @@ export class CrimeList extends React.Component<{}, CrimeState> {
      * @returns {HTMLElement} The html for the component.
      */
     render() {
-        const crimes = this.state.crimes.map((crime: CrimeData, index: number) => <CrimeEntry
+        const crimes = this.state.crimes
+            .map((crime: CrimeData, index: number) => <CrimeEntry
             key={index} {...crime} />);
-        return <div>
-            <h1>Crimes</h1>
-            {crimes}
-        </div>
+        return (
+            <div>
+                <h1>Crimes</h1>
+                {crimes}
+            </div>
+        )
     }
 }
 
