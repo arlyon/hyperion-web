@@ -17,5 +17,6 @@ export const App = () => (
             <SearchBox/>
             <People/>
             <CrimeList/>
+            <BikeList />
         </main>
     </div>);
