@@ -36,22 +36,3 @@ export const Person = (props: IPerson) =>
             <dd>{props.is_relative.toString()}</dd>
         </dl>
     </article>;
-
-/**
- * A class-based component.
- */
-export class Person2 extends React.Component<IPerson, {}> {
-    public render() {
-        return (
-            <article>
-                <h1>{this.props.name}</h1>
-                <dl>
-                    <dt>Born</dt>
-                    <dd>{this.props.birthday}</dd>
-                    <dt>Relative</dt>
-                    <dd>{this.props.is_relative.toString()}</dd>
-                </dl>
-            </article>
-        )
-    }
-}
