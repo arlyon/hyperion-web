@@ -1,14 +1,14 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 
 export class BikeList extends React.Component <{}, { bikes: any[], search: string }> {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             bikes: [], //empty string because string ^
             search: "",
-        }
-        this.fetchData()
+        };
+
+        // this.fetchData()
     }
 
     /**
@@ -22,7 +22,7 @@ export class BikeList extends React.Component <{}, { bikes: any[], search: strin
 
     updateSearch = (event) => {
         this.setState({search: event.target.value});
-    }
+    };
 
 
     render() {
@@ -30,6 +30,7 @@ export class BikeList extends React.Component <{}, { bikes: any[], search: strin
             if (this.state.search === "") {
                 return true; //Display all if search is empty
             }
+
             for (let key of Object.keys(bike)) {
                 try {
                     if (bike[key].toLowerCase().includes(this.state.search)) {
