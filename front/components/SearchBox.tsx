@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
-    TextField,
     Button,
+    Autocomplete,
 } from "react-md";
 import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
@@ -10,8 +10,8 @@ import {AreaData} from "./AreaData";
 interface ISearchState {
     searchString: string,
     error: boolean,
-    match: boolean,
     region: string,
+    autoComplete: any[],
     address: IAddress | null
     neighbourhood: INeighbourhood | null
 }
@@ -39,7 +39,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             region: "",
             address: null,
             neighbourhood: null,
-            match: false,
+            autoComplete: [],
         };
     }
 
@@ -49,38 +49,96 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     public render() {
 
-        const areadata = this.state.address || this.state.neighbourhood ?
+        const areaData = this.state.address || this.state.neighbourhood ?
             <AreaData address={this.state.address} neighbourhood={this.state.neighbourhood}/> :
             null;
 
         return (
             <div style={{padding: "2em"}}>
-                <TextField
-                    id="application-title"
-                    label="Search For A Postcode"
-                    customSize="title"
+                <Autocomplete
+                    id="postcode-lookup"
+                    label={this.state.region || "Search For A Postcode"}
                     className="md-cell md-cell--12"
                     inlineIndicator={<Button icon={true}>search</Button>}
-                    onChange={this.updateSearch}
+                    customSize="title"
+                    filter={null}
+                    data={this.state.autoComplete}
                     value={this.state.searchString}
-                    helpText={this.state.region}
-                    helpOnFocus={true}
+                    onChange={this.handleSearchUpdate}
+                    onAutocomplete={this.handleAutoComplete}
                     error={this.state.error}
-                    style={{color: "green"}}
+                    dataLabel="label"
+                    dataValue="value"
                 />
-                {areadata}
+                {areaData}
             </div>
         );
     }
 
     /**
      * The update search event handler.
-     * @param value
-     * @param event
+     * @param searchString
      */
-    private updateSearch = (value: string, event: any) => {
-        value = value.toUpperCase().replace(" ", "");
+    private handleSearchUpdate = async (searchString: string) => {
+        searchString = searchString.toUpperCase();
 
+        this.setState({
+            address: null,
+            neighbourhood: null,
+        });
+
+        const regionName = this.getRegionForPostcode(searchString);
+
+        this.setState({
+            searchString,
+            region: regionName ? regionName : null,
+            error: searchString !== "" && regionName === undefined,
+        });
+
+        if (searchString !== "" && (regionName !== undefined || searchString.length == 1)) this.getAutoCompleteForPostcode(searchString);
+        if (searchString.length >= 5 && regionName !== undefined) this.getLocalDataForPostcode(searchString);
+    };
+
+    /**
+     * Manages the autocomplete click event.
+     * @param clickedValue The value that was clicked on.
+     */
+    private handleAutoComplete = (clickedValue) => {
+        if (this.state.searchString !== clickedValue) {
+            this.setState({searchString: clickedValue});
+            if (clickedValue.length >= 5) this.getLocalDataForPostcode(clickedValue)
+        }
+    };
+
+    /**
+     * Gets the autocomplete data from the server.
+     * @returns {Promise<void>} Returns nothing.
+     * TODO calculating the bold doesn't take spaces into account. can lead to malformed highlighting
+     */
+    private getAutoCompleteForPostcode = async (searchString: string) => {
+        const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete`);
+        const postcodes = (await autocomplete_lookup.json())["result"] || [];
+
+        const processed = postcodes.map((next) => ({
+            label: [
+                <span key="bold" className="md-font-bold">{next.substring(0, searchString.length)}</span>,
+                next.substring(searchString.length),
+            ],
+            value: next
+        }));
+
+        this.setState({
+            autoComplete: processed, // make sure it's not null
+            error: processed.length === 0 // if no results, the postcode is invalid!
+        });
+    };
+
+    /**
+     * Gets the region and looks up the postcode.
+     * @param {string} searchString
+     * @returns {string | null} The region.
+     */
+    private getRegionForPostcode(searchString: string) {
         /**
          * The regex for postcodes. Group one is the
          * zone, and group two is the rest.
@@ -104,31 +162,22 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
          * DN55 1PT
          */
         const re = /^([A-Z]{1,2})([0-9]?[A-Z]?[0-9 ]{0,3}[A-Z]{0,2})$/;
-        const match = re.exec(value);
-
-        this.setState({
-            address: null,
-            neighbourhood: null,
-            match: false,
-        });
+        const match = re.exec(searchString);
 
         let regionName;
         if (match) {
             regionName = this.props.postcodes[match[1]];
-
-            if (match[2].length > 3) {
-                this.getPostcodeData(match[0])
-            }
         }
+        return regionName
+    }
 
-        this.setState({
-            searchString: value,
-            region: regionName ? regionName : null,
-            error: value !== "" && regionName === undefined
-        });
-    };
-
-    private getPostcodeData = async (postcode: string) => {
+    /**
+     * Gets the data for a given postcode.
+     * @param {string} postcode The postcode to look up.
+     * @returns {Promise<void>} Returns nothing.
+     * TODO maybe do better 404 handling
+     */
+    private getLocalDataForPostcode = async (postcode: string) => {
         const address = fetch(`/api/postcode/${postcode}`);
         const neighbourhood = fetch(`/api/neighbourhood/${postcode}`);
 

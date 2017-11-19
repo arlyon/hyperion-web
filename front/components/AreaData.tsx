@@ -8,7 +8,6 @@ import {
     ListItem,
     CardActions,
     ListItemProps,
-    Subheader
 } from "react-md";
 
 import {IAddress} from "../interfaces/Address";
@@ -74,7 +73,7 @@ export class AreaData extends React.Component<AreaDataProps, { nearby: any[] }> 
  */
 interface LinkedListItemProps extends ListItemProps {
     href: string;
-    newTab?: boolean;
+    newtab?: boolean;
 }
 
 /**
@@ -95,7 +94,7 @@ const LocalInfo = (props: {neighbourhood: any, address: any, nearby: any}) => {
             primaryText={item.title}
             secondaryText={`${item.dist} meters away`}
             href={`https://en.wikipedia.org/?curid=${item.pageid}`}
-            newTab={true}
+            newtab={true}
         />
     ));
 
@@ -124,7 +123,7 @@ const LocalInfo = (props: {neighbourhood: any, address: any, nearby: any}) => {
  * A hyperlinked list item.
  */
 const HyperLinkListItem = (props: LinkedListItemProps) => (
-    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}} target={props.newTab ? "_blank" : undefined}>
+    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}} target={props.newtab ? "_blank" : undefined}>
         <ListItem {...props} />
     </a>
 );
