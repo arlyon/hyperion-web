@@ -2,12 +2,13 @@ import * as React from "react";
 import {Button, Toolbar, Card, Tab, Tabs, TabsContainer, FontIcon} from "react-md";
 
 import {CrimeList} from "./components/crime";
-import {SearchBox} from "./components/SearchBox"
+import {SearchBox} from "./components/SearchBox";
 import {BikeList} from "./components/BikeList";
-import POSTCODES from "./data/postcodes"
+import POSTCODES from "./data/postcodes";
+import './style/main.styl';
 
 export const App = () => (
-    <div>
+    <div id="app">
         <Toolbar
             colored={true}
             title="Crime Checker"
