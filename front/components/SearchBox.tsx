@@ -5,7 +5,7 @@ import {
 } from "react-md";
 import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
-import {AreaData} from "./AreaData";
+import {PostCodeData} from "./PostCodeData";
 
 interface ISearchState {
     searchString: string,
@@ -20,6 +20,7 @@ export interface ISearchProps {
     postcodes: {
         [prefix: string]: string
     }
+    foundValid: (postcode: string) => void
 }
 
 /**
@@ -48,30 +49,22 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      * @returns {HTMLElement} The html for the component.
      */
     public render() {
-
-        const areaData = this.state.address || this.state.neighbourhood ?
-            <AreaData address={this.state.address} neighbourhood={this.state.neighbourhood}/> :
-            null;
-
         return (
-            <div style={{padding: "2em"}}>
-                <Autocomplete
-                    id="postcode-lookup"
-                    label={this.state.region || "Search For A Postcode"}
-                    className="md-cell md-cell--12"
-                    inlineIndicator={<Button icon={true}>search</Button>}
-                    customSize="title"
-                    filter={null}
-                    data={this.state.autoComplete}
-                    value={this.state.searchString}
-                    onChange={this.handleSearchUpdate}
-                    onAutocomplete={this.handleAutoComplete}
-                    error={this.state.error}
-                    dataLabel="label"
-                    dataValue="value"
-                />
-                {areaData}
-            </div>
+            <Autocomplete
+                id="search"
+                label={this.state.region || "Search For A Postcode"}
+                className="md-cell md-cell--12"
+                inlineIndicator={<Button icon={true}>search</Button>}
+                customSize="title"
+                filter={null}
+                data={this.state.autoComplete}
+                value={this.state.searchString}
+                onChange={this.handleSearchUpdate}
+                onAutocomplete={this.handleAutoComplete}
+                error={this.state.error}
+                dataLabel="label"
+                dataValue="value"
+            />
         );
     }
 
@@ -96,17 +89,16 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         });
 
         if (searchString !== "" && (regionName !== undefined || searchString.length == 1)) this.getAutoCompleteForPostcode(searchString);
-        if (searchString.length >= 5 && regionName !== undefined) this.getLocalDataForPostcode(searchString);
     };
 
     /**
      * Manages the autocomplete click event.
      * @param clickedValue The value that was clicked on.
      */
-    private handleAutoComplete = (clickedValue) => {
+    private handleAutoComplete = (clickedValue: string) => {
         if (this.state.searchString !== clickedValue) {
             this.setState({searchString: clickedValue});
-            if (clickedValue.length >= 5) this.getLocalDataForPostcode(clickedValue)
+            this.props.foundValid(clickedValue);
         }
     };
 
@@ -131,6 +123,10 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             autoComplete: processed, // make sure it's not null
             error: processed.length === 0 // if no results, the postcode is invalid!
         });
+
+        if (postcodes.length == 1) {
+            this.props.foundValid(postcodes[0])
+        }
     };
 
     /**
@@ -169,24 +165,5 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             regionName = this.props.postcodes[match[1]];
         }
         return regionName
-    }
-
-    /**
-     * Gets the data for a given postcode.
-     * @param {string} postcode The postcode to look up.
-     * @returns {Promise<void>} Returns nothing.
-     * TODO maybe do better 404 handling
-     */
-    private getLocalDataForPostcode = async (postcode: string) => {
-        const address = fetch(`/api/postcode/${postcode}`);
-        const neighbourhood = fetch(`/api/neighbourhood/${postcode}`);
-
-        const address_json = await (await address).json();
-        const neighbourhood_json = await (await neighbourhood).json();
-
-        this.setState({
-            address: address_json.message ? null : address_json,
-            neighbourhood: neighbourhood_json.message ? null : neighbourhood_json,
-        })
     }
 }

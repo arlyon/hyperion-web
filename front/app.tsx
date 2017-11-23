@@ -6,33 +6,52 @@ import {SearchBox} from "./components/SearchBox";
 import {BikeList} from "./components/BikeList";
 import POSTCODES from "./data/postcodes";
 import './style/main.styl';
+import {PostCodeData} from "./components/PostCodeData";
 
-export const App = () => (
-    <div id="app">
-        <Toolbar
-            colored={true}
-            title="Crime Checker"
-            actions={<Button icon={true}>info</Button>}
-            component="nav"
-        />
-        <main>
-            <h1 className="title">Find Crime Near You</h1>
-            <SearchBox postcodes={POSTCODES}/>
-            <Card style={{marginTop: "5em"}}>
-                <TabsContainer
-                    panelClassName="md-grid"
-                    labelAndIcon={true}
+export class App extends React.Component<{}, {postcode: string | null}> {
+    constructor(props: {}) {
+        super(props);
+
+        this.state = {
+            postcode: null,
+        }
+    }
+
+    updatePostcode = (postcode: string) => {
+        this.setState({postcode,})
+    };
+
+    render() {
+        return (
+            <div id="app">
+                <Toolbar
                     colored={true}
-                >
-                    <Tabs tabId="simple-tab">
-                        <Tab label="Local Crime" icon={<FontIcon>warning</FontIcon>}>
-                            <CrimeList/>
-                        </Tab>
-                        <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
-                            <BikeList/>
-                        </Tab>
-                    </Tabs>
-                </TabsContainer>
-            </Card>
-        </main>
-    </div>);
+                    title="Crime Checker"
+                    actions={<Button icon={true}>info</Button>}
+                    component="nav"
+                />
+                <main>
+                    <h1 id="title" className="title">Find Crime Near You</h1>
+                    <SearchBox postcodes={POSTCODES} foundValid={this.updatePostcode}/>
+                    {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
+                    <Card className="data">
+                        <TabsContainer
+                            panelClassName="md-grid"
+                            labelAndIcon={true}
+                            colored={true}
+                        >
+                            <Tabs tabId="simple-tab">
+                                <Tab label="Local Crime" icon={<FontIcon>warning</FontIcon>}>
+                                    <CrimeList/>
+                                </Tab>
+                                <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
+                                    <BikeList/>
+                                </Tab>
+                            </Tabs>
+                        </TabsContainer>
+                    </Card>
+                </main>
+            </div>
+        );
+    }
+}
