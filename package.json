@@ -4,8 +4,8 @@
   "description": "## useful articles",
   "main": "./front/app.ts",
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
+    "build": "node ./node_modules/webpack/bin/webpack.js",
+    "watch": "node ./node_modules/webpack/bin/webpack.js --watch",
     "server": "webpack-dev-server --hot",
     "buildstats": "webpack --profile --json > stats.json",
     "docs": "./node_modules/.bin/typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/"
