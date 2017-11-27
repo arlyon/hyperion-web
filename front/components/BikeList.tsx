@@ -3,7 +3,7 @@ import * as React from "react";
 import { TextField } from 'react-md';
 import { Card, CardTitle, CardText} from 'react-md';
 
-export class BikeList extends React.Component <{}, { bikes: any[], search: string }> {
+export class BikeList extends React.Component <{postcode}, { bikes: any[], search: string }> {
     constructor(props) {
         super(props);
         this.state = {
@@ -11,15 +11,25 @@ export class BikeList extends React.Component <{}, { bikes: any[], search: strin
             search: "",
         };
 
-        // this.fetchData()
+        //this.fetchData()
     }
 
+    public componentWillReceiveProps(nextProps) {
+        if (nextProps.postcode !== this.props.postcode) { //new props object
+            //If postcode is null
+            if (nextProps.postcode === null) {
+                //Remove all displayed data by setting bike state to empty list
+                this.setState({bikes: []})
+            } //if its not null we want to display all information about that postcode
+            this.fetchData(nextProps.postcode);
+        }
+    }
     /**
      * Fetches the data from the server and sets the received data in the state.
      * @returns {Promise<void>} Returns nothing.
      */
-    private async fetchData() {
-        const response = await fetch("/api/bikes/");
+    private async fetchData(postcode : string) {
+        const response = await fetch(`/api/bikes/$[postcode]`);
         this.setState({bikes: await response.json()})
     }
 

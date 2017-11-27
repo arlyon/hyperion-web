@@ -136,7 +136,7 @@ export class App extends React.Component<{}, {postcode: string | null, toasts: a
                                     <CrimeList/>
                                 </Tab>
                                 <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
-                                    <BikeList/>
+                                    <BikeList postcode={this.state.postcode}/>
                                 </Tab>
                             </Tabs>
                         </TabsContainer>
