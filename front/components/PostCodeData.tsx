@@ -10,8 +10,13 @@ import {
     ListItemProps,
 } from "react-md";
 
-import {IAddress} from "../interfaces/Address";
-import {INeighbourhood} from "../interfaces/Neighbourhood";
+/**
+ * Extends the ListItem to also define an href.
+ */
+interface LinkedListItemProps extends ListItemProps {
+    href: string;
+    newtab?: boolean;
+}
 
 /**
  * PostCodeData shows data about a specific location.
@@ -22,7 +27,7 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
      * Creates a new instance of the PostCodeData component.
      * @param props The properties for the component.
      */
-    constructor(props: {postcode: string}) {
+    constructor(props: { postcode: string }) {
         super(props);
         this.state = {
             nearby: [],
@@ -70,7 +75,6 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
     /**
      * Renders the LocalInfo and PoliceInfo components if there is data for them.
      * @returns {HTMLElement} The markup for the component.
-     * TODO: clean up the props
      */
     public render() {
         return (
@@ -80,14 +84,6 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
             </div>
         )
     }
-}
-
-/**
- * Extends the ListItem to also define an href.
- */
-interface LinkedListItemProps extends ListItemProps {
-    href: string;
-    newtab?: boolean;
 }
 
 /**
@@ -138,8 +134,7 @@ const LocalInfo = (props: { address: any, nearby: any }) => {
  * A hyperlinked list item.
  */
 const HyperLinkListItem = (props: LinkedListItemProps) => (
-    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}}
-       target={props.newtab ? "_blank" : undefined}>
+    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}} target={props.newtab ? "_blank" : undefined}>
         <ListItem {...props} />
     </a>
 );

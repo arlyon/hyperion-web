@@ -3,24 +3,21 @@ import {
     Button,
     Autocomplete,
 } from "react-md";
-import {IAddress} from "../interfaces/Address";
-import {INeighbourhood} from "../interfaces/Neighbourhood";
-import {PostCodeData} from "./PostCodeData";
+import config from '../config';
 
 interface ISearchState {
     searchString: string,
     error: boolean,
-    region: string,
+    region: string | null,
     autoComplete: any[],
-    address: IAddress | null
-    neighbourhood: INeighbourhood | null
 }
 
 export interface ISearchProps {
-    postcodes: {
+    regions: {
         [prefix: string]: string
-    }
-    foundValid: (postcode: string) => void
+    };
+    foundValid: (postcode: string) => void;
+    online: boolean;
 }
 
 /**
@@ -38,8 +35,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             searchString: "",
             error: false,
             region: "",
-            address: null,
-            neighbourhood: null,
             autoComplete: [],
         };
     }
@@ -53,10 +48,11 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             <Autocomplete
                 id="search"
                 label={this.state.region || "Search For A Postcode"}
-                className="md-cell md-cell--12"
-                inlineIndicator={<Button icon={true}>search</Button>}
+                inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
                 customSize="title"
                 filter={null}
+                helpText="Yolo"
+                helpOnFocus={true}
                 data={this.state.autoComplete}
                 value={this.state.searchString}
                 onChange={this.handleSearchUpdate}
@@ -69,25 +65,51 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     }
 
     /**
+     * Manually calls the foundValid function with the current search string.
+     */
+    private submitPostcode = () => {
+        this.props.foundValid(this.state.searchString)
+    };
+
+    /**
+     * Updates the autocomplete when the client goes online/offline.
+     * @param {Readonly<P>} props The new props for the component.
+     */
+    public componentWillReceiveProps(props) {
+        if (!props.online && this.props.online) { // we are online going offline
+            this.setState({autoComplete: []})
+        } else if (props.online && !this.props.online) {
+            this.getAutoCompleteForPostcode(this.state.searchString, props.online)
+        }
+    }
+
+    /**
+     * Sets the error state and vibrates the device.
+     * @param {boolean} value
+     */
+    private setError = (value: boolean) => {
+        if (this.state.error !== value) {
+            this.setState({error: value});
+            if (value === true) {
+                navigator.vibrate(config.vibrateOnError);
+            }
+        }
+    };
+
+    /**
      * The update search event handler.
      * @param searchString
      */
     private handleSearchUpdate = async (searchString: string) => {
         searchString = searchString.toUpperCase();
-
-        this.setState({
-            address: null,
-            neighbourhood: null,
-        });
-
         const regionName = this.getRegionForPostcode(searchString);
 
         this.setState({
             searchString,
-            region: regionName ? regionName : null,
-            error: searchString !== "" && regionName === undefined,
+            region: regionName
         });
 
+        this.setError(searchString !== "" && regionName === undefined);
         if (searchString !== "" && (regionName !== undefined || searchString.length == 1)) this.getAutoCompleteForPostcode(searchString);
     };
 
@@ -107,7 +129,9 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      * @returns {Promise<void>} Returns nothing.
      * TODO calculating the bold doesn't take spaces into account. can lead to malformed highlighting
      */
-    private getAutoCompleteForPostcode = async (searchString: string) => {
+    private getAutoCompleteForPostcode = async (searchString: string, online=this.props.online) => {
+        if (!online) return;
+
         const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete`);
         const postcodes = (await autocomplete_lookup.json())["result"] || [];
 
@@ -121,10 +145,11 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
 
         this.setState({
             autoComplete: processed, // make sure it's not null
-            error: processed.length === 0 // if no results, the postcode is invalid!
         });
 
-        if (postcodes.length == 1) {
+        this.setError(postcodes.length === 0);
+
+        if (postcodes.length === 1) {
             this.props.foundValid(postcodes[0])
         }
     };
@@ -134,36 +159,10 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      * @param {string} searchString
      * @returns {string | null} The region.
      */
-    private getRegionForPostcode(searchString: string) {
-        /**
-         * The regex for postcodes. Group one is the
-         * zone, and group two is the rest.
-         * @type {RegExp}
-         *
-         * These are all valid post codes.
-         * EH47BL
-         * LE33AW
-         * EC1R4UR
-         * EC1A1BB
-         * W1A0AX
-         * M11AE
-         * B338TH
-         * CR26XH
-         * DN551PT
-         * EC1A 1BB
-         * W1A 0AX
-         * M1 1AE
-         * B33 8TH
-         * CR2 6XH
-         * DN55 1PT
-         */
+    private getRegionForPostcode(searchString: string): string | null {
         const re = /^([A-Z]{1,2})([0-9]?[A-Z]?[0-9 ]{0,3}[A-Z]{0,2})$/;
         const match = re.exec(searchString);
 
-        let regionName;
-        if (match) {
-            regionName = this.props.postcodes[match[1]];
-        }
-        return regionName
+        return match ? this.props.regions[match[1]] : null;
     }
 }
