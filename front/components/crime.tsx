@@ -22,7 +22,7 @@ export class CrimeList extends React.Component<{}, ICrimeState> {
             crimes: [],
         };
 
-        this.fetchData();
+        // this.fetchData();
     }
 
     /**
