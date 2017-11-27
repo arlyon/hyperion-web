@@ -1,0 +1,41 @@
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
+
+/**
+ * A simple table demonstrating the hierarchy of the `Table` component and its sub-components.
+ */
+const CrimeTableSimple = () => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHeaderColumn>ID</TableHeaderColumn>
+        <TableHeaderColumn>Category</TableHeaderColumn>
+        <TableHeaderColumn>Month</TableHeaderColumn>
+        <TableHeaderColumn>Location</TableHeaderColumn>
+		<TableHeaderColumn>Context</TableHeaderColumn>
+		<TableHeaderColumn>Outcome</TableHeaderColumn>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableRowColumn>{props.persistent_id}</TableRowColumn><!-- ID, this is the actual POLICE ID for the crime not the id for the API -->
+        <TableRowColumn>{props.category}</TableRowColumn><!-- Category -->
+        <TableRowColumn>{props.month}</TableRowColumn><!-- Date -->
+        <TableRowColumn>{pr</TableRowColumn><!-- Location -->
+        <TableRowColumn>{props.object_of_search}</TableRowColumn><!-- Context -->
+        <TableRowColumn>{props.outcome_status}</TableRowColumn><!-- Outcome, adds date along with outcome -->		
+      </TableRow>
+    </TableBody>
+  </Table>
+);
+
+export default CrimeTableSimple;
+
+https://data.police.uk/api/crimes-street/all-crime?poly=55.939,-3.182:55.952,-3.172:55.952,-3.219&date=2017-01
+
