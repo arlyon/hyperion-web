@@ -8,8 +8,10 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
             bikes: [], 
             search: "",
         };
+         if (this.props.postcode) {
+            this.fetchData(this.props.postcode);
+        }
 
-        //this.fetchData()
     }
 
     public componentWillReceiveProps(nextProps) {
@@ -66,7 +68,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
 
         return (
             <section style={style}>
-                {bikeMarkUp}
+                {bikeMarkUp.length ? bikeMarkUp : <h1>N/A</h1>}
             </section>
         )
     }
