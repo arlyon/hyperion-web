@@ -51,8 +51,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
                 inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
                 customSize="title"
                 filter={null}
-                helpText="Yolo"
-                helpOnFocus={true}
                 data={this.state.autoComplete}
                 value={this.state.searchString}
                 onChange={this.handleSearchUpdate}

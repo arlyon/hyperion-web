@@ -20,10 +20,20 @@ interface LinkedListItemProps extends ListItemProps {
     newtab?: boolean;
 }
 
+interface IPostCodeDataState {
+    nearby: any[],
+    neighbourhood: INeighbourhood | null,
+    address: IAddress | null
+}
+
+export interface IPostCodeDataProps {
+    postcode: string
+}
+
 /**
  * PostCodeData shows data about a specific location.
  */
-export class PostCodeData extends React.Component<{ postcode: string }, { nearby: any[], neighbourhood: IAddress | null, address: INeighbourhood | null }> {
+export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeDataState> {
 
     /**
      * Creates a new instance of the PostCodeData component.
@@ -35,15 +45,33 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
             nearby: [],
             neighbourhood: null,
             address: null
+        };
+
+        if (this.props.postcode) {
+            this.fetchNearbyLocations(this.props.postcode);
+            this.getLocalDataForPostcode(this.props.postcode);
         }
     }
 
     /**
-     * Finds nearby locations when the component loads.
+     * Checks for a change in post code and clears or
+     * updates the data if it is needed.
+     * @param {Readonly<P>} nextProps
      */
-    public componentDidMount() {
-        this.fetchNearbyLocations(this.props.postcode);
-        this.getLocalDataForPostcode(this.props.postcode)
+    public componentWillReceiveProps(nextProps) {
+
+        console.log("new props", nextProps, this.props)
+        if (this.props.postcode !== nextProps.postcode) {
+            if (nextProps.postcode === null) {
+                this.setState({
+                    neighbourhood: null,
+                    address: null
+                })
+            } else {
+                this.fetchNearbyLocations(nextProps.postcode);
+                this.getLocalDataForPostcode(nextProps.postcode);
+            }
+        }
     }
 
     /**
@@ -59,7 +87,6 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
      * Gets the data for a given postcode.
      * @param {string} postcode The postcode to look up.
      * @returns {Promise<void>} Returns nothing.
-     * TODO maybe do better 404 handling
      */
     private getLocalDataForPostcode = async (postcode: string) => {
         const address = fetch(`/api/postcode/${postcode}`);
@@ -92,9 +119,8 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
  * Displays information about a postcode area.
  * @param props The properties for the component.
  * @returns {HTMLElement} The markup for the component.
- * TODO: revise the prop interface
  */
-const LocalInfo = (props: { address: any, nearby: any }) => {
+const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
 
     /**
      * Creates LinkedListItems for each nearby wikipedia entry.
@@ -136,7 +162,8 @@ const LocalInfo = (props: { address: any, nearby: any }) => {
  * A hyperlinked list item.
  */
 const HyperLinkListItem = (props: LinkedListItemProps) => (
-    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}} target={props.newtab ? "_blank" : undefined}>
+    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}}
+       target={props.newtab ? "_blank" : undefined}>
         <ListItem {...props} />
     </a>
 );
@@ -170,10 +197,13 @@ const PoliceInfo = (props: { neighbourhood: any }) => {
         facebook_handle = facebook_parts.pop() || facebook_parts.pop(); // trailing slash
     }
 
+    const parsed_text = document.createElement("div");
+    parsed_text.innerHTML = props.neighbourhood.description;
+
     return (
         <Card style={{marginTop: "2em"}}>
             <CardTitle title="Local Police" subtitle={`${props.neighbourhood.name}`}/>
-            {props.neighbourhood.description ? <CardText><p>{props.neighbourhood.description}</p></CardText> : null}
+            {props.neighbourhood.description ? <CardText><p>{parsed_text.innerText}</p></CardText> : null}
             <CardActions
                 expander={showExtra}
                 className="md-divider-border md-divider-border--top md-divider-border--bottom"

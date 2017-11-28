@@ -1,10 +1,10 @@
 import * as React from "react";
 import {
-  DataTable,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableColumn,
+    DataTable,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableColumn,
 } from 'react-md';
 
 /**
@@ -66,12 +66,12 @@ interface CrimeData {
 /**
  * The crime class.
  */
-export class CrimeList extends React.Component<{postcode}, CrimeState> {
+export class CrimeList extends React.Component<{ postcode }, CrimeState> {
     /**
      * Instantiates a new instance of the CrimeList component.
      * @param {{}} props The props (none).
      */
-    constructor(props: {postcode}) {
+    constructor(props: { postcode }) {
         super(props);
 
         this.state = {
@@ -81,13 +81,13 @@ export class CrimeList extends React.Component<{postcode}, CrimeState> {
     }
 
     public componentWillReceiveProps(nextProps) {
-        if (this.props.postcode !== nextProps.postcode){
+        if (this.props.postcode !== nextProps.postcode) {
             if (nextProps.postcode === null) {
                 this.setState({crimes: []});
             }
             else {
                 this.fetchData(nextProps.postcode);
-             }
+            }
         }
     }
 
@@ -102,7 +102,7 @@ export class CrimeList extends React.Component<{postcode}, CrimeState> {
     }
 
     private static readableCategories(categoryName: string) {
-        switch(categoryName) {
+        switch (categoryName) {
             case "all-crime":
                 return "All crime";
             case "anti-social-behaviour":
@@ -174,7 +174,7 @@ export class CrimeList extends React.Component<{postcode}, CrimeState> {
         let violentcrime: number = 0;
         let othercrime: number = 0;
 
-        for(let crime of crimes) {
+        for (let crime of crimes) {
             switch (crime.category) {
                 case "all-crime":
                     allcrime++;
@@ -209,19 +209,22 @@ export class CrimeList extends React.Component<{postcode}, CrimeState> {
                     othercrime++;
             }
         }
-        let list : number[] = [allcrime,antisocial,bicycletheft,burglary,criminaldamage,drugs,othertheft,possessionofweapons,publicorder, robbery, shoplifting, theftfromperson, vehiclecrime, violentcrime, othercrime]
+        let list: number[] = [allcrime, antisocial, bicycletheft, burglary, criminaldamage, drugs, othertheft, possessionofweapons, publicorder, robbery, shoplifting, theftfromperson, vehiclecrime, violentcrime, othercrime]
         return list;
-        }
+    }
+
     /**
      * Called when react renders the component to the DOM.
      * @returns {HTMLElement} The html for the component.
      */
     render() {
-        const crimes = this.state.crimes.map((crime: CrimeData, index: number) => <CrimeEntry
-            key={index} {...crime} />);
-        let listOfCrimes : number [] = this.summarizeCategories(this.state.crimes);
-        return<div>
+        const crimes = this.state.crimes.map((crime: CrimeData, index: number) => (
+            <CrimeEntry key={index} {...crime} />)
+        );
+        let listOfCrimes: number [] = this.summarizeCategories(this.state.crimes);
+        return (
             <table>
+                <tbody>
                 <tr>
                     <td><b>All crime:</b></td>
                     <td>{listOfCrimes[0]}</td>
@@ -278,8 +281,8 @@ export class CrimeList extends React.Component<{postcode}, CrimeState> {
                     <td><b>Other crime:</b></td>
                     <td>{listOfCrimes[13]}</td>
                 </tr>
-            </table>
-        </div>
+                </tbody>
+            </table>)
     }
 }
 
