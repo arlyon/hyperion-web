@@ -213,93 +213,102 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
         return list;
     }
 
+    private existsData(list: number[]) {
+        for (let x of list) {
+            if (x > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Called when react renders the component to the DOM.
      * @returns {HTMLElement} The html for the component.
      */
     render() {
-        const crimes = this.state.crimes.map((crime: CrimeData, index: number) => (
-            <CrimeEntry key={index} {...crime} />)
-        );
         let listOfCrimes: number [] = this.summarizeCategories(this.state.crimes);
-        return (
-            <table>
-                <tbody>
-                <tr>
-                    <td><b>All crime:</b></td>
-                    <td>{listOfCrimes[0]}</td>
-                </tr>
-                <tr>
-                    <td><b>Anti-social behaviour:</b></td>
-                    <td>{listOfCrimes[1]}</td>
-                </tr>
-                <tr>
-                    <td><b>Bicycle theft:</b></td>
-                    <td>{listOfCrimes[2]}</td>
-                </tr>
-                <tr>
-                    <td><b>Burglary:</b></td>
-                    <td>{listOfCrimes[3]}</td>
-                </tr>
-                <tr>
-                    <td><b>Criminal damage and arson:</b></td>
-                    <td>{listOfCrimes[4]}</td>
-                </tr>
-                <tr>
-                    <td><b>Other theft:</b></td>
-                    <td>{listOfCrimes[5]}</td>
-                </tr>
-                <tr>
-                    <td><b>Possession of weapons:</b></td>
-                    <td>{listOfCrimes[6]}</td>
-                </tr>
-                <tr>
-                    <td><b>Public order:</b></td>
-                    <td>{listOfCrimes[7]}</td>
-                </tr>
-                <tr>
-                    <td><b>Robbery:</b></td>
-                    <td>{listOfCrimes[8]}</td>
-                </tr>
-                <tr>
-                    <td><b>Shoplifting:</b></td>
-                    <td>{listOfCrimes[9]}</td>
-                </tr>
-                <tr>
-                    <td><b>Theft from the person:</b></td>
-                    <td>{listOfCrimes[10]}</td>
-                </tr>
-                <tr>
-                    <td><b>Vehicle crime:</b></td>
-                    <td>{listOfCrimes[11]}</td>
-                </tr>
-                <tr>
-                    <td><b>Violent and sexual offences:</b></td>
-                    <td>{listOfCrimes[12]}</td>
-                </tr>
-                <tr>
-                    <td><b>Other crime:</b></td>
-                    <td>{listOfCrimes[13]}</td>
-                </tr>
-                </tbody>
-            </table>)
+        if (this.existsData(listOfCrimes)) {
+            return<div>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td><b>All crime:</b></td>
+                        <td>{listOfCrimes[0]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Anti-social behaviour:</b></td>
+                        <td>{listOfCrimes[1]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Bicycle theft:</b></td>
+                        <td>{listOfCrimes[2]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Burglary:</b></td>
+                        <td>{listOfCrimes[3]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Criminal damage and arson:</b></td>
+                        <td>{listOfCrimes[4]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Other theft:</b></td>
+                        <td>{listOfCrimes[5]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Possession of weapons:</b></td>
+                        <td>{listOfCrimes[6]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Public order:</b></td>
+                        <td>{listOfCrimes[7]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Robbery:</b></td>
+                        <td>{listOfCrimes[8]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Shoplifting:</b></td>
+                        <td>{listOfCrimes[9]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Theft from the person:</b></td>
+                        <td>{listOfCrimes[10]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Vehicle crime:</b></td>
+                        <td>{listOfCrimes[11]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Violent and sexual offences:</b></td>
+                        <td>{listOfCrimes[12]}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Other crime:</b></td>
+                        <td>{listOfCrimes[13]}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+        return<h1>Doesn't display!</h1>
     }
-}
+                /**
+                * Displays a crime, given the data for it.
+                * @param {CrimeData} props The crime data for the crime.
+                * @returns {HTMLElement} The markup for the crime.
 
-/**
- * Displays a crime, given the data for it.
- * @param {CrimeData} props The crime data for the crime.
- * @returns {HTMLElement} The markup for the crime.
- */
-const CrimeEntry = (props: CrimeData) => {
-    return (
-        <tr>
-            <td>{props.id}</td>
-            <td>{props.category}</td>
-            <td>{props.month}</td>
-            <td>{props.location.street.name.replace("On or near ", "")}</td>
-            <td>{props.context}</td>
-        </tr>
+                const CrimeEntry = (props: CrimeData) => {
+                return (
+                <tr>
+                <td>{props.id}</td>
+                <td>{props.category}</td>
+                <td>{props.month}</td>
+                <td>{props.location.street.name.replace("On or near ", "")}</td>
+                <td>{props.context}</td>
+                </tr>
+*/
 
-    )
-};
+
+            }
