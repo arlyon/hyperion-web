@@ -79,7 +79,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
         };
 
         if (this.props.postcode) {
-            this.fetchData(postcode)
+            this.fetchData(this.props.postcode)
         }
 
     }

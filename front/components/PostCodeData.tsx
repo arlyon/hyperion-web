@@ -11,6 +11,7 @@ import {
 } from "react-md";
 import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
+import {Twitter} from "./Twitter";
 
 /**
  * Extends the ListItem to also define an href.
@@ -188,6 +189,7 @@ const PoliceInfo = (props: { neighbourhood: any }) => {
     if (props.neighbourhood.twitter) {
         const twitter_parts = props.neighbourhood.twitter.split("/");
         twitter_handle = twitter_parts.pop() || twitter_parts.pop(); // trailing slash
+
     }
 
     let facebook_handle;
@@ -217,7 +219,7 @@ const PoliceInfo = (props: { neighbourhood: any }) => {
                 {props.neighbourhood.facebook ?
                     <Button flat={true} href={`https://www.facebook.com/${facebook_handle}`}>facebook</Button> : null}
             </CardActions>
-            {showExtra ? <CardText expandable={true}>{locations}</CardText> : null}
+            {showExtra ? <CardText expandable={true}><Twitter twitterHandle={twitter_handle}/>{locations}</CardText> : null}
         </Card>
     )
 };

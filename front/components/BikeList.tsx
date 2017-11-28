@@ -68,7 +68,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
 
         return (
             <section style={style}>
-                {bikeMarkUp.length ? bikeMarkUp : <h1>N/A</h1>}
+                {bikeMarkUp.length ? bikeMarkUp : <h1>No bike crime in your area!</h1>}
             </section>
         )
     }
