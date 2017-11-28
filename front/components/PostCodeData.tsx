@@ -162,8 +162,11 @@ const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
  * A hyperlinked list item.
  */
 const HyperLinkListItem = (props: LinkedListItemProps) => (
-    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}}
-       target={props.newtab ? "_blank" : undefined}>
+    <a
+        href={props.href}
+        style={{color: "inherit", textDecoration: "inherit"}}
+        target={props.newtab ? "_blank" : undefined}
+    >
         <ListItem {...props} />
     </a>
 );
@@ -178,7 +181,7 @@ const PoliceInfo = (props: { neighbourhood: any }) => {
     const showExtra = props.neighbourhood.locations.length > 0;
 
     const locations = props.neighbourhood.locations.map((location, index) => (
-        <Card>
+        <Card key={index}>
             <CardTitle title={location.name} subtitle={location.type}/>
         </Card>
     ));
