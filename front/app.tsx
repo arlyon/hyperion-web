@@ -85,6 +85,7 @@ export class App extends React.Component<{}, IAppState> {
 
     public render() {
         return (
+
             <div id="app">
                 <Toolbar
                     colored={true}

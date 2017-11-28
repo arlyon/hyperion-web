@@ -5,7 +5,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
     constructor(props: {postcode}) {
         super(props);
         this.state = {
-            bikes: [], //empty string because string ^
+            bikes: [], 
             search: "",
         };
 
