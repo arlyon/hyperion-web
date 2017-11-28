@@ -6,9 +6,8 @@
   "scripts": {
     "build": "node ./node_modules/webpack/bin/webpack.js",
     "watch": "node ./node_modules/webpack/bin/webpack.js --watch",
-    "server": "webpack-dev-server --hot",
-    "buildstats": "webpack --profile --json > stats.json",
-    "docs": "./node_modules/.bin/typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/"
+    "server": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
+    "docs": "node ./node_modules/typedoc/bin/typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/"
   },
   "repository": {
     "type": "git",
