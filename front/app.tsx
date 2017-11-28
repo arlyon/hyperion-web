@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Button, Toolbar, Card, Tab, Tabs, TabsContainer, FontIcon, Snackbar, DialogContainer} from "react-md";
 
-import {CrimeList} from "./components/crime";
+import {CrimeList} from "./components/Crime";
 import {SearchBox} from "./components/SearchBox";
 import {BikeList} from "./components/BikeList";
 import POSTCODES from "./data/postcodes";
