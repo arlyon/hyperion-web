@@ -6,6 +6,7 @@ import {
     TableRow,
     TableColumn,
 } from 'react-md';
+import {MessageBox} from "./Message";
 
 /**
  * The state for the CrimeList component.
@@ -79,7 +80,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
         };
 
         if (this.props.postcode) {
-            this.fetchData(postcode)
+            this.fetchData(this.props.postcode)
         }
 
     }
@@ -232,6 +233,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
      */
     render() {
         let listOfCrimes: number [] = this.summarizeCategories(this.state.crimes);
+
         if (this.existsData(listOfCrimes)) {
             return<div>
                 <table>
@@ -296,7 +298,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
                 </table>
             </div>
         }
-        return<h1>Doesn't display!</h1>
+        return <MessageBox message="No Thefts In Your Area"/>
     }
                 /**
                 * Displays a crime, given the data for it.

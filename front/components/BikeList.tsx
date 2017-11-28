@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Card, CardTitle, CardText} from 'react-md';
+import {MessageBox} from "./Message";
 
 export class BikeList extends React.Component <{ postcode }, { bikes: any[], search: string }> {
     constructor(props: {postcode}) {
@@ -67,9 +68,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
         };
 
         return (
-            <section style={style}>
-                {bikeMarkUp.length ? bikeMarkUp : <h1>N/A</h1>}
-            </section>
+            bikeMarkUp.length ? <section style={style}>{bikeMarkUp}</section> : <MessageBox message="No Thefts In Your Area"/>
         )
     }
 }
