@@ -78,6 +78,10 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
             crimes: []
         };
 
+        if (this.props.postcode) {
+            this.fetchData(postcode)
+        }
+
     }
 
     public componentWillReceiveProps(nextProps) {
