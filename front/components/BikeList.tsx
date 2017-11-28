@@ -1,10 +1,8 @@
 import * as React from "react";
-//import * as ReactDOM from "react-dom";
-import { TextField } from 'react-md';
-import { Card, CardTitle, CardText} from 'react-md';
+import {Card, CardTitle, CardText} from 'react-md';
 
-export class BikeList extends React.Component <{postcode}, { bikes: any[], search: string }> {
-    constructor(props) {
+export class BikeList extends React.Component <{ postcode }, { bikes: any[], search: string }> {
+    constructor(props: {postcode}) {
         super(props);
         this.state = {
             bikes: [], //empty string because string ^
@@ -24,18 +22,19 @@ export class BikeList extends React.Component <{postcode}, { bikes: any[], searc
             this.fetchData(nextProps.postcode);
         }
     }
+
     /**
      * Fetches the data from the server and sets the received data in the state.
      * @returns {Promise<void>} Returns nothing.
      */
-    private async fetchData(postcode : string) {
-        const response = await fetch(`/api/bikes/$[postcode]`);
+    private async fetchData(postcode: string) {
+        const response = await fetch(`/api/bikes/${postcode}`);
         this.setState({bikes: await response.json()})
     }
 
-    updateSearch = (value: string, event: any) => {
+    updateSearch = (value: string) => {
         this.setState({search: value});
-    }
+    };
 
     render() {
 
@@ -49,41 +48,28 @@ export class BikeList extends React.Component <{postcode}, { bikes: any[], searc
                     if (bike[key].toLowerCase().includes(this.state.search)) {
                         return true;
                     }
-                } catch {
-
-                }
+                } catch (Exception) {}
             }
             return false
         };
         const bikeMarkUp = this.state.bikes
             .filter(bikeFilter) //passes bike as parameter to function BikeFilter
-            .map((stolenbike, index) => <CardForBikes {...stolenbike} />);
-        return <section>
-            <h1> Stolen bikes </h1>
-            <TextField
-                id="floating-center-title"
-                label="Bikes"
-                lineDirection="center"
-                placeholder="Search for bike model..."
-                className="md-cell md-cell--bottom"
-                value={this.state.search}
-                onChange={this.updateSearch}
-                customSize = "title"
-             />
-            <section style={{
-                marginTop: "3em",
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: "center",
-            }
-            }>
+            .map((stolenBike, index) => <CardForBikes  key={index} {...stolenBike} />);
+
+        const style = {
+            marginTop: "3em",
+            display: "flex" as "flex",
+            flexDirection: "row" as "row",
+            flexWrap: "wrap" as "wrap",
+            justifyContent: "center" as "center",
+        };
+
+        return (
+            <section style={style}>
                 {bikeMarkUp}
-
             </section>
-
-        </section>
-           }
+        )
+    }
 }
 
 interface IBikeTheft {
@@ -99,36 +85,36 @@ interface IBikeTheft {
 
 }
 
-function CardForBikes(props:IBikeTheft) {
-    const style = { maxWidth: 320, minWidth: 320 };
+function CardForBikes(props: IBikeTheft) {
+    const style = {maxWidth: 320, minWidth: 320};
     const propsNew = {} as IBikeTheft;
     for (let x of Object.keys(props)) {
         propsNew[x] = props[x] || "N/A"
     }
     return (
-     <Card style={style}>
-        <CardTitle title={propsNew.model} subtitle={propsNew.make} />
-        <CardText>
-        <article><b>
-            Latitude:</b> {propsNew.latitude}
-        </article>
-        <article> <b>
-            longitude: </b> {propsNew.longitude}
-        </article>
-        <article><b>
-            Frame number: </b> {propsNew.frame_number}
-        </article>
-        <article><b>
-            Colour: </b> {propsNew.colour}
-        </article>
-        <article><b>
-            Description: </b> {propsNew.description}
-        </article>
-        <article><b>
-            Reported at: </b> {propsNew.reported_at}
-        </article>
-    </CardText>
-  </Card>
+        <Card style={style}>
+            <CardTitle title={propsNew.model} subtitle={propsNew.make}/>
+            <CardText>
+                <article><b>
+                    Latitude:</b> {propsNew.latitude}
+                </article>
+                <article><b>
+                    longitude: </b> {propsNew.longitude}
+                </article>
+                <article><b>
+                    Frame number: </b> {propsNew.frame_number}
+                </article>
+                <article><b>
+                    Colour: </b> {propsNew.colour}
+                </article>
+                <article><b>
+                    Description: </b> {propsNew.description}
+                </article>
+                <article><b>
+                    Reported at: </b> {propsNew.reported_at}
+                </article>
+            </CardText>
+        </Card>
     );
 }
 

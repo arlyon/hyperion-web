@@ -9,6 +9,8 @@ import {
     CardActions,
     ListItemProps,
 } from "react-md";
+import {IAddress} from "../interfaces/Address";
+import {INeighbourhood} from "../interfaces/Neighbourhood";
 
 /**
  * Extends the ListItem to also define an href.
@@ -21,7 +23,7 @@ interface LinkedListItemProps extends ListItemProps {
 /**
  * PostCodeData shows data about a specific location.
  */
-export class PostCodeData extends React.Component<{ postcode: string }, { nearby: any[], neighbourhood: any | null, address: any | null }> {
+export class PostCodeData extends React.Component<{ postcode: string }, { nearby: any[], neighbourhood: IAddress | null, address: INeighbourhood | null }> {
 
     /**
      * Creates a new instance of the PostCodeData component.
@@ -40,16 +42,16 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
      * Finds nearby locations when the component loads.
      */
     public componentDidMount() {
-        this.fetchNearbyLocations();
-        this.getLocalDataForPostcode()
+        this.fetchNearbyLocations(this.props.postcode);
+        this.getLocalDataForPostcode(this.props.postcode)
     }
 
     /**
      * Gets nearby locations from wikipedia and sets the state.
      * @returns {Promise<void>} Returns nothing.
      */
-    private fetchNearbyLocations = async () => {
-        const request = await fetch(`/api/nearby/${this.props.postcode}`);
+    private fetchNearbyLocations = async (postcode: string) => {
+        const request = await fetch(`/api/nearby/${postcode}`);
         this.setState({nearby: await request.json()})
     };
 
@@ -59,9 +61,9 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
      * @returns {Promise<void>} Returns nothing.
      * TODO maybe do better 404 handling
      */
-    private getLocalDataForPostcode = async () => {
-        const address = fetch(`/api/postcode/${this.props.postcode}`);
-        const neighbourhood = fetch(`/api/neighbourhood/${this.props.postcode}`);
+    private getLocalDataForPostcode = async (postcode: string) => {
+        const address = fetch(`/api/postcode/${postcode}`);
+        const neighbourhood = fetch(`/api/neighbourhood/${postcode}`);
 
         const address_json = await (await address).json();
         const neighbourhood_json = await (await neighbourhood).json();
@@ -172,8 +174,10 @@ const PoliceInfo = (props: { neighbourhood: any }) => {
         <Card style={{marginTop: "2em"}}>
             <CardTitle title="Local Police" subtitle={`${props.neighbourhood.name}`}/>
             {props.neighbourhood.description ? <CardText><p>{props.neighbourhood.description}</p></CardText> : null}
-            <CardActions expander={showExtra}
-                         className="md-divider-border md-divider-border--top md-divider-border--bottom">
+            <CardActions
+                expander={showExtra}
+                className="md-divider-border md-divider-border--top md-divider-border--bottom"
+            >
                 {props.neighbourhood.email ?
                     <Button icon={true} href={`mailto:${props.neighbourhood.email}`}>mail</Button> : null}
                 {props.neighbourhood.telephone ?

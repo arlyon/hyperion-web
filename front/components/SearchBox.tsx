@@ -91,6 +91,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         if (this.state.error !== value) {
             this.setState({error: value});
             if (value === true) {
+                console.log(config.vibrateOnError);
                 navigator.vibrate(config.vibrateOnError);
             }
         }

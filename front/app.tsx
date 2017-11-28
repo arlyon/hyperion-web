@@ -8,7 +8,15 @@ import POSTCODES from "./data/postcodes";
 import './style/main.styl';
 import {PostCodeData} from "./components/PostCodeData";
 
-export class App extends React.Component<{}, {postcode: string | null, toasts: any[], showInfo: boolean, autoHide: boolean, online: boolean}> {
+interface IAppState {
+    postcode: string | null,
+    toasts: any[],
+    showInfo: boolean,
+    autoHide: boolean,
+    online: boolean
+}
+
+export class App extends React.Component<{}, IAppState> {
 
     /**
      * Called to construct the app class.
@@ -43,7 +51,6 @@ export class App extends React.Component<{}, {postcode: string | null, toasts: a
     }
 
     private reconnect = () => {
-        console.log("reconnect");
         if (navigator.onLine) {
             this.addToast("Reconnected");
         } else {
@@ -51,11 +58,11 @@ export class App extends React.Component<{}, {postcode: string | null, toasts: a
         }
     };
 
-    private addToast = (text, action?, autoHide = true) => {
+    private addToast = (text: string, action?: { children: string, onClick: any }, autoHide = true) => {
         this.setState((state) => {
             const toasts = state.toasts.slice();
-            toasts.push({ text, action });
-            return { toasts, autoHide };
+            toasts.push({text, action});
+            return {toasts, autoHide};
         });
     };
 
@@ -65,7 +72,7 @@ export class App extends React.Component<{}, {postcode: string | null, toasts: a
 
     private dismissToast = () => {
         const [, ...toasts] = this.state.toasts;
-        this.setState({ toasts })
+        this.setState({toasts})
     };
 
     private showInfo = () => {
@@ -123,7 +130,7 @@ export class App extends React.Component<{}, {postcode: string | null, toasts: a
                 </DialogContainer>
                 <main>
                     <h1 id="title" className="title">Find Crime Near You</h1>
-                    <SearchBox regions={POSTCODES} foundValid={this.updatePostcode} online={this.state.online} />
+                    <SearchBox regions={POSTCODES} foundValid={this.updatePostcode} online={this.state.online}/>
                     {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
                     <Card className="data">
                         <TabsContainer
