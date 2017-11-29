@@ -1,15 +1,18 @@
 import * as React from "react";
-import {Card, CardTitle, CardText} from 'react-md';
+import {Card, CardTitle, CardText, TextField, Toolbar} from 'react-md';
+import {MessageBox} from "./Message";
 
 export class BikeList extends React.Component <{ postcode }, { bikes: any[], search: string }> {
-    constructor(props: {postcode}) {
+    constructor(props: { postcode }) {
         super(props);
         this.state = {
-            bikes: [], //empty string because string ^
+            bikes: [],
             search: "",
         };
+        if (this.props.postcode) {
+            this.fetchData(this.props.postcode);
+        }
 
-        //this.fetchData()
     }
 
     public componentWillReceiveProps(nextProps) {
@@ -45,29 +48,25 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
 
             for (let key of Object.keys(bike)) {
                 try {
-                    if (bike[key].toLowerCase().includes(this.state.search)) {
+                    if (bike[key].toLowerCase().includes(this.state.search.toLowerCase())) {
                         return true;
                     }
-                } catch (Exception) {}
+                } catch (Exception) {
+                }
             }
             return false
         };
         const bikeMarkUp = this.state.bikes
             .filter(bikeFilter) //passes bike as parameter to function BikeFilter
-            .map((stolenBike, index) => <CardForBikes  key={index} {...stolenBike} />);
-
-        const style = {
-            marginTop: "3em",
-            display: "flex" as "flex",
-            flexDirection: "row" as "row",
-            flexWrap: "wrap" as "wrap",
-            justifyContent: "center" as "center",
-        };
+            .map((stolenBike, index) => <Bike key={index} {...stolenBike} />);
 
         return (
-            <section style={style}>
-                {bikeMarkUp}
-            </section>
+            this.state.bikes.length ? (
+                <section className="bikecontainer">
+                    <TextField id="bikefilter" placeholder="Filter..." customSize="title" value={this.state.search} onChange={this.updateSearch} />
+                    {bikeMarkUp.length ? bikeMarkUp : <MessageBox message="No Matching Bikes"/>}
+                </section>
+            ) : <MessageBox message="No Thefts In Your Area"/>
         )
     }
 }
@@ -82,37 +81,35 @@ interface IBikeTheft {
     rfid?: string | null,
     description?: null | string,
     reported_at?: string | null,
-
 }
 
-function CardForBikes(props: IBikeTheft) {
-    const style = {maxWidth: 320, minWidth: 320};
+function Bike(props: IBikeTheft) {
     const propsNew = {} as IBikeTheft;
     for (let x of Object.keys(props)) {
         propsNew[x] = props[x] || "N/A"
     }
     return (
-        <Card style={style}>
+        <Card className="bikecard">
             <CardTitle title={propsNew.model} subtitle={propsNew.make}/>
             <CardText>
-                <article><b>
-                    Latitude:</b> {propsNew.latitude}
-                </article>
-                <article><b>
-                    longitude: </b> {propsNew.longitude}
-                </article>
-                <article><b>
-                    Frame number: </b> {propsNew.frame_number}
-                </article>
-                <article><b>
-                    Colour: </b> {propsNew.colour}
-                </article>
-                <article><b>
-                    Description: </b> {propsNew.description}
-                </article>
-                <article><b>
-                    Reported at: </b> {propsNew.reported_at}
-                </article>
+                <p>
+                    <b>Latitude:</b> {propsNew.latitude}
+                </p>
+                <p>
+                    <b>longitude: </b> {propsNew.longitude}
+                </p>
+                <p>
+                    <b>Frame number: </b> {propsNew.frame_number}
+                </p>
+                <p>
+                    <b>Colour: </b> {propsNew.colour}
+                </p>
+                <p>
+                    <b>Description: </b> {propsNew.description}
+                </p>
+                <p>
+                    <b>Reported at: </b> {propsNew.reported_at}
+                </p>
             </CardText>
         </Card>
     );

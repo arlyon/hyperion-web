@@ -85,6 +85,7 @@ export class App extends React.Component<{}, IAppState> {
 
     public render() {
         return (
+
             <div id="app">
                 <Toolbar
                     colored={true}
@@ -132,6 +133,7 @@ export class App extends React.Component<{}, IAppState> {
                     <h1 id="title" className="title">Find Crime Near You</h1>
                     <SearchBox regions={POSTCODES} foundValid={this.updatePostcode} online={this.state.online}/>
                     {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
+                    {this.state.postcode ?
                     <Card className="data">
                         <TabsContainer
                             panelClassName="md-grid"
@@ -140,14 +142,14 @@ export class App extends React.Component<{}, IAppState> {
                         >
                             <Tabs tabId="simple-tab">
                                 <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
-                                    <CrimeList postcode = {this.state.postcode}/>
+                                    <CrimeList postcode={this.state.postcode}/>
                                 </Tab>
                                 <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
                                     <BikeList postcode={this.state.postcode}/>
                                 </Tab>
                             </Tabs>
                         </TabsContainer>
-                    </Card>
+                    </Card> : null }
                 </main>
                 <Snackbar
                     id="example"

@@ -5,25 +5,27 @@ import {
     CardTitle,
     CardText,
     List,
-    ListItem,
     CardActions,
-    ListItemProps,
 } from "react-md";
 import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
+import {Twitter} from "./Twitter";
+import {HyperLinkListItem} from "./HyperLinkListItem";
 
-/**
- * Extends the ListItem to also define an href.
- */
-interface LinkedListItemProps extends ListItemProps {
-    href: string;
-    newtab?: boolean;
+interface IPostCodeDataState {
+    nearby: any[],
+    neighbourhood: INeighbourhood | null,
+    address: IAddress | null
+}
+
+export interface IPostCodeDataProps {
+    postcode: string
 }
 
 /**
  * PostCodeData shows data about a specific location.
  */
-export class PostCodeData extends React.Component<{ postcode: string }, { nearby: any[], neighbourhood: IAddress | null, address: INeighbourhood | null }> {
+export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeDataState> {
 
     /**
      * Creates a new instance of the PostCodeData component.
@@ -35,15 +37,33 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
             nearby: [],
             neighbourhood: null,
             address: null
+        };
+
+        if (this.props.postcode) {
+            this.fetchNearbyLocations(this.props.postcode);
+            this.getLocalDataForPostcode(this.props.postcode);
         }
     }
 
     /**
-     * Finds nearby locations when the component loads.
+     * Checks for a change in post code and clears or
+     * updates the data if it is needed.
+     * @param {Readonly<P>} nextProps
      */
-    public componentDidMount() {
-        this.fetchNearbyLocations(this.props.postcode);
-        this.getLocalDataForPostcode(this.props.postcode)
+    public componentWillReceiveProps(nextProps) {
+
+        console.log("new props", nextProps, this.props)
+        if (this.props.postcode !== nextProps.postcode) {
+            if (nextProps.postcode === null) {
+                this.setState({
+                    neighbourhood: null,
+                    address: null
+                })
+            } else {
+                this.fetchNearbyLocations(nextProps.postcode);
+                this.getLocalDataForPostcode(nextProps.postcode);
+            }
+        }
     }
 
     /**
@@ -59,18 +79,17 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
      * Gets the data for a given postcode.
      * @param {string} postcode The postcode to look up.
      * @returns {Promise<void>} Returns nothing.
-     * TODO maybe do better 404 handling
      */
     private getLocalDataForPostcode = async (postcode: string) => {
-        const address = fetch(`/api/postcode/${postcode}`);
-        const neighbourhood = fetch(`/api/neighbourhood/${postcode}`);
+        const address_request = fetch(`/api/postcode/${postcode}`);
+        const neighbourhood_request = fetch(`/api/neighbourhood/${postcode}`);
 
-        const address_json = await (await address).json();
-        const neighbourhood_json = await (await neighbourhood).json();
+        const address = await (await address_request).json();
+        const neighbourhood = await (await neighbourhood_request).json();
 
         this.setState({
-            address: address_json.message ? null : address_json,
-            neighbourhood: neighbourhood_json.message ? null : neighbourhood_json,
+            address: address.message ? null : address,
+            neighbourhood: neighbourhood.message ? null : neighbourhood,
         })
     };
 
@@ -92,9 +111,8 @@ export class PostCodeData extends React.Component<{ postcode: string }, { nearby
  * Displays information about a postcode area.
  * @param props The properties for the component.
  * @returns {HTMLElement} The markup for the component.
- * TODO: revise the prop interface
  */
-const LocalInfo = (props: { address: any, nearby: any }) => {
+const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
 
     /**
      * Creates LinkedListItems for each nearby wikipedia entry.
@@ -133,61 +151,128 @@ const LocalInfo = (props: { address: any, nearby: any }) => {
 };
 
 /**
- * A hyperlinked list item.
- */
-const HyperLinkListItem = (props: LinkedListItemProps) => (
-    <a href={props.href} style={{color: "inherit", textDecoration: "inherit"}} target={props.newtab ? "_blank" : undefined}>
-        <ListItem {...props} />
-    </a>
-);
-
-/**
  * Displays information about a police neighbourhood.
  * @param props The props for the component.
  * @constructor
  */
-const PoliceInfo = (props: { neighbourhood: any }) => {
+class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[] }> {
+    constructor(props: { neighbourhood: any }) {
+        super(props);
 
-    const showExtra = props.neighbourhood.locations.length > 0;
+        this.state = {
+            tweets: []
+        };
 
-    const locations = props.neighbourhood.locations.map((location, index) => (
-        <Card>
-            <CardTitle title={location.name} subtitle={location.type}/>
-        </Card>
-    ));
-
-    let twitter_handle;
-
-    if (props.neighbourhood.twitter) {
-        const twitter_parts = props.neighbourhood.twitter.split("/");
-        twitter_handle = twitter_parts.pop() || twitter_parts.pop(); // trailing slash
+        const twitter_handle = PoliceInfo.getTwitterHandle(this.props.neighbourhood.twitter)
+        if (twitter_handle) this.fetchData(twitter_handle)
     }
 
-    let facebook_handle;
-
-    if (props.neighbourhood.facebook) {
-        const facebook_parts = props.neighbourhood.facebook.split("/");
-        facebook_handle = facebook_parts.pop() || facebook_parts.pop(); // trailing slash
+    /**
+     * Fetches the data from the server and sets the received data in the state.
+     * @returns {Promise<void>} Returns nothing.
+     */
+    private async fetchData(twitterHandle: string) {
+        const response = await fetch(`/api/rss/${twitterHandle}`);
+        this.setState({tweets: await response.json()})
     }
 
-    return (
-        <Card style={{marginTop: "2em"}}>
-            <CardTitle title="Local Police" subtitle={`${props.neighbourhood.name}`}/>
-            {props.neighbourhood.description ? <CardText><p>{props.neighbourhood.description}</p></CardText> : null}
-            <CardActions
-                expander={showExtra}
-                className="md-divider-border md-divider-border--top md-divider-border--bottom"
-            >
-                {props.neighbourhood.email ?
-                    <Button icon={true} href={`mailto:${props.neighbourhood.email}`}>mail</Button> : null}
-                {props.neighbourhood.telephone ?
-                    <Button icon={true} href={`tel:${props.neighbourhood.telephone}`}>phone</Button> : null}
-                {props.neighbourhood.twitter ?
-                    <Button flat={true} href={`https://www.twitter.com/${twitter_handle}`}>twitter</Button> : null}
-                {props.neighbourhood.facebook ?
-                    <Button flat={true} href={`https://www.facebook.com/${facebook_handle}`}>facebook</Button> : null}
-            </CardActions>
-            {showExtra ? <CardText expandable={true}>{locations}</CardText> : null}
-        </Card>
-    )
-};
+    private static getTwitterHandle(url: string) {
+        if (url) {
+            const twitter_parts = url.split("/");
+            return twitter_parts.pop() || twitter_parts.pop(); // trailing slash
+        }
+        return null;
+    }
+
+    private static getFacebookHandle(url: string) {
+        if (url) {
+            const facebook_parts = url.split("/");
+            return facebook_parts.pop() || facebook_parts.pop(); // trailing slash
+        }
+        return null;
+    }
+
+    private static cleanHTMLTags(html: string) {
+        const parsed_text = document.createElement("div");
+        parsed_text.innerHTML = html;
+        console.log(parsed_text.innerText, html)
+        return parsed_text.innerText
+    }
+
+    public componentWillReceiveProps(nextProps) {
+        if (nextProps.neighbourhood.twitter !== this.props.neighbourhood.twitter) {
+            if (nextProps.neighbourhood.twitter === null) {
+                this.setState({tweets: []})
+            } else {
+                const twitter_handle = PoliceInfo.getTwitterHandle(nextProps.neighbourhood.twitter);
+                if (twitter_handle) this.fetchData(twitter_handle);
+            }
+        }
+    }
+
+    public render() {
+        const facebook_handle = PoliceInfo.getFacebookHandle(this.props.neighbourhood.facebook)
+        const twitter_handle = PoliceInfo.getTwitterHandle(this.props.neighbourhood.twitter);
+
+        const description = this.props.neighbourhood.description ?
+            <CardText><p>{PoliceInfo.cleanHTMLTags(this.props.neighbourhood.description)}</p></CardText> :
+            null;
+
+        const email_button = this.props.neighbourhood.email ?
+            <Button icon={true} href={`mailto:${this.props.neighbourhood.email}`}>mail</Button> :
+            null;
+
+        const phone_button = this.props.neighbourhood.telephone ?
+            <Button icon={true} href={`tel:${this.props.neighbourhood.telephone}`}>phone</Button> :
+            null;
+
+        const twitter_button = twitter_handle ?
+            <Button flat={true} href={`https://www.twitter.com/${twitter_handle}`}>twitter</Button> :
+            null;
+
+        const facebook_button = facebook_handle ?
+            <Button flat={true} href={`https://www.facebook.com/${facebook_handle}`}>facebook</Button> :
+            null;
+
+        const twitter_feed = this.state.tweets.length ? (
+            <section>
+                <h1 className="center bold">Recent Twitter Posts</h1>
+                <Twitter tweets={this.state.tweets}/>
+            </section>
+        ) : null;
+
+        const locations_list = this.props.neighbourhood.locations.map((location, index) => (
+            <Card key={index}>
+                <CardTitle title={location.name} subtitle={location.type}/>
+            </Card>
+        ));
+
+        const locations = locations_list.length ? (
+            <section>
+                <h1 className="center bold">Local Police Locations</h1>
+                {locations_list}
+            </section>
+        ) : null;
+
+
+        return (
+            <Card className="policeneighbourhood">
+                <CardTitle title="Local Police" subtitle={`${this.props.neighbourhood.name}`}/>
+                {description}
+                <CardActions
+                    expander={!!locations_list.length || !!this.state.tweets.length}
+                    className="md-divider-border md-divider-border--top md-divider-border--bottom"
+                >
+                    {email_button}
+                    {phone_button}
+                    {twitter_button}
+                    {facebook_button}
+                </CardActions>
+                <CardText expandable={true}>
+                    {twitter_feed}
+                    {locations}
+                </CardText>
+            </Card>
+        )
+    }
+}
