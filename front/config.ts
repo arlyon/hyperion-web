@@ -3,5 +3,6 @@
  */
 export default {
     vibrateOnError: 300,
-    apiRoot: "https://crimechecker.herokuapp.com/",
+    apiRoot: "https://crimechecker.herokuapp.com",
+    debug: false,
 }

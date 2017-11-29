@@ -199,7 +199,6 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
     private static cleanHTMLTags(html: string) {
         const parsed_text = document.createElement("div");
         parsed_text.innerHTML = html;
-        console.log(parsed_text.innerText, html)
         return parsed_text.innerText
     }
 

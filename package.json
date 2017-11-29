@@ -5,6 +5,7 @@
   "main": "./front/app.ts",
   "scripts": {
     "build": "node ./node_modules/webpack/bin/webpack.js",
+    "build:min": "node ./node_modules/webpack/bin/webpack.js --optimize-minimize",
     "watch": "node ./node_modules/webpack/bin/webpack.js --watch",
     "server": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
     "docs": "node ./node_modules/typedoc/bin/typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/"
