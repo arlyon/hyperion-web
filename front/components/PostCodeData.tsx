@@ -11,6 +11,7 @@ import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
 import {Twitter} from "./Twitter";
 import {HyperLinkListItem} from "./HyperLinkListItem";
+import config from "../config";
 
 /**
  * The props for postcode data.
@@ -75,7 +76,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private fetchNearbyLocations = async (postcode: string) => {
-        const request = await fetch(`/api/nearby/${postcode}`);
+        const request = await fetch(`${config.apiRoot}/api/nearby/${postcode}`);
         this.setState({nearby: await request.json()})
     };
 
@@ -85,8 +86,8 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private getLocalDataForPostcode = async (postcode: string) => {
-        const address_request = fetch(`/api/postcode/${postcode}`);
-        const neighbourhood_request = fetch(`/api/neighbourhood/${postcode}`);
+        const address_request = fetch(`${config.apiRoot}/api/postcode/${postcode}`);
+        const neighbourhood_request = fetch(`${config.apiRoot}/api/neighbourhood/${postcode}`);
 
         const address = await (await address_request).json();
         const neighbourhood = await (await neighbourhood_request).json();
@@ -171,7 +172,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
      * @returns {Promise<void>} Returns nothing.
      */
     private async fetchData(twitterHandle: string) {
-        const response = await fetch(`/api/rss/${twitterHandle}`);
+        const response = await fetch(`${config.apiRoot}/api/rss/${twitterHandle}`);
         this.setState({tweets: await response.json()})
     }
 
@@ -198,6 +199,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
     private static cleanHTMLTags(html: string) {
         const parsed_text = document.createElement("div");
         parsed_text.innerHTML = html;
+        console.log(parsed_text.innerText, html)
         return parsed_text.innerText
     }
 

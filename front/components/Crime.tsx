@@ -8,6 +8,7 @@ import {
 } from 'react-md';
 import {MessageBox} from "./Message";
 import {CrimeData} from "../interfaces/Crime";
+import config from "../config";
 
 /**
  * The state for the CrimeList component.
@@ -56,7 +57,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
      * @returns {Promise<void>} Returns nothing.
      */
     private async fetchData(postcode) {
-        const response = await fetch(`/api/crime/${postcode}`);
+        const response = await fetch(`${config.apiRoot}/api/crime/${postcode}`);
         this.setState({crimes: await response.json()});
 
     }

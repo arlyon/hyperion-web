@@ -2,6 +2,7 @@ import * as React from "react";
 import {Card, CardTitle, CardText, TextField} from 'react-md';
 import {IBikeTheft} from '../interfaces/BikeTheft'
 import {MessageBox} from "./Message";
+import config from "../config";
 
 /**
  * Given a postcode, fetches a list of stolen bikes nearby.
@@ -41,7 +42,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
      * @returns {Promise<void>} Returns nothing.
      */
     private async fetchData(postcode: string) {
-        const response = await fetch(`/api/bikes/${postcode}`);
+        const response = await fetch(`${config.apiRoot}/api/bikes/${postcode}`);
         this.setState({bikes: await response.json()})
     }
 
