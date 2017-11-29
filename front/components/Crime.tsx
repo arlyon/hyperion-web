@@ -171,6 +171,6 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
                     </TableBody>
                 </DataTable>)
         }
-        return <MessageBox message="No Thefts In Your Area"/>
+        return <MessageBox message="No Crime In Your Area"/>
     }
 }

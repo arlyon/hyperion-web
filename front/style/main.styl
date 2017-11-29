@@ -9,13 +9,12 @@ div#app
 
 main
   width 800px
+  margin 5em auto
+  flex-grow 1
   @media screen and (max-width 400px)
     width 100vw
   @media screen and (min-width 401px) and (max-width 800px)
     width 400px
-
-  margin 5em auto
-  flex-grow 1
 
 #postcodedata
   margin-top 2em
@@ -30,3 +29,37 @@ h1.title
 .md-data-table--responsive
   width: 100%
 
+.policeneighbourhood
+  margin-top 2em
+
+.bikecontainer
+  display flex
+  flex-direction row
+  width 100%
+  flex-wrap wrap
+  justify-content center
+  .bikecard
+    max-width 320px
+    min-width 320px
+    margin 1em
+
+.hyperlinklist
+  color: inherit
+  text-decoration inherit
+
+section.messagebox
+  display flex
+  justify-content center
+  align-items center
+  min-height 20em
+  width 100%
+
+  > h1
+    font-weight: bold
+    color rgba(0,0,0,0.8)
+
+.bold
+  font-weight bold
+
+.center
+  text-align center
