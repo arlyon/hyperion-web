@@ -5,6 +5,9 @@ import {
 } from "react-md";
 import config from '../config';
 
+/**
+ * The internal state for the search box.
+ */
 interface ISearchState {
     searchString: string,
     error: boolean,
@@ -12,6 +15,9 @@ interface ISearchState {
     autoComplete: any[],
 }
 
+/**
+ * The interface for the search props.
+ */
 export interface ISearchProps {
     regions: {
         [prefix: string]: string
@@ -31,35 +37,18 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     constructor(props: ISearchProps) {
         super(props);
 
+        const search = localStorage.getItem("search");
+
         this.state = {
-            searchString: "",
+            searchString: search ? search : "",
             error: false,
             region: "",
             autoComplete: [],
         };
-    }
 
-    /**
-     * Called when react renders the component to the DOM.
-     * @returns {HTMLElement} The html for the component.
-     */
-    public render() {
-        return (
-            <Autocomplete
-                id="search"
-                label={this.state.region || "Search For A Postcode"}
-                inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
-                customSize="title"
-                filter={null}
-                data={this.state.autoComplete}
-                value={this.state.searchString}
-                onChange={this.handleSearchUpdate}
-                onAutocomplete={this.handleAutoComplete}
-                error={this.state.error}
-                dataLabel="label"
-                dataValue="value"
-            />
-        );
+        if (search) {
+            this.getAutoCompleteForPostcode(search)
+        }
     }
 
     /**
@@ -101,7 +90,13 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     private handleSearchUpdate = async (searchString: string) => {
         searchString = searchString.toUpperCase();
+
+        if (searchString.length == 0) {
+            this.props.foundValid("")
+        }
+
         const regionName = this.getRegionForPostcode(searchString);
+        localStorage.setItem("search", searchString);
 
         this.setState({
             searchString,
@@ -128,7 +123,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      * @returns {Promise<void>} Returns nothing.
      * TODO calculating the bold doesn't take spaces into account. can lead to malformed highlighting
      */
-    private getAutoCompleteForPostcode = async (searchString: string, online=this.props.online) => {
+    private getAutoCompleteForPostcode = async (searchString: string, online = this.props.online) => {
         if (!online) return;
 
         const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete`);
@@ -161,7 +156,29 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     private getRegionForPostcode(searchString: string): string | null {
         const re = /^([A-Z]{1,2})([0-9]?[A-Z]?[0-9 ]{0,3}[A-Z]{0,2})$/;
         const match = re.exec(searchString);
-
         return match ? this.props.regions[match[1]] : null;
+    }
+
+    /**
+     * Called when react renders the component to the DOM.
+     * @returns {HTMLElement} The html for the component.
+     */
+    public render() {
+        return (
+            <Autocomplete
+                id="search"
+                label={this.state.region || "Search For A Postcode"}
+                inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
+                customSize="title"
+                filter={null}
+                data={this.state.autoComplete}
+                value={this.state.searchString}
+                onChange={this.handleSearchUpdate}
+                onAutocomplete={this.handleAutoComplete}
+                error={this.state.error}
+                dataLabel="label"
+                dataValue="value"
+            />
+        );
     }
 }

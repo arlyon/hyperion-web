@@ -8,6 +8,9 @@ import POSTCODES from "./data/postcodes";
 import './style/main.styl';
 import {PostCodeData} from "./components/PostCodeData";
 
+/**
+ * The state of the app.
+ */
 interface IAppState {
     postcode: string | null,
     toasts: any[],
@@ -16,6 +19,9 @@ interface IAppState {
     online: boolean
 }
 
+/**
+ * The main entry point of the application.
+ */
 export class App extends React.Component<{}, IAppState> {
 
     /**
@@ -44,20 +50,29 @@ export class App extends React.Component<{}, IAppState> {
         })
     }
 
+    /**
+     * Lets the user know if they are offline.
+     */
     public componentDidMount() {
         if (!navigator.onLine) {
             this.addToast("Looks like you're offline. Functionality will be limited.");
         }
     }
 
-    private reconnect = () => {
-        if (navigator.onLine) {
-            this.addToast("Reconnected");
-        } else {
-            this.addToast("Couldn't reconnect.", {children: "Try Again", onClick: this.reconnect}, false);
-        }
+    /**
+     * Passed into the search box and called to update the postcode.
+     * @param {string} postcode The new postcode.
+     */
+    private updatePostcode = (postcode: string) => {
+        this.setState({postcode})
     };
 
+    /**
+     * Adds a new toast to the toast list.
+     * @param {string} text The toast text.
+     * @param {any} action An action button.
+     * @param {boolean} autoHide Whether to auto hide.
+     */
     private addToast = (text: string, action?: { children: string, onClick: any }, autoHide = true) => {
         this.setState((state) => {
             const toasts = state.toasts.slice();
@@ -66,26 +81,34 @@ export class App extends React.Component<{}, IAppState> {
         });
     };
 
-    private updatePostcode = (postcode: string) => {
-        this.setState({postcode,})
-    };
-
+    /**
+     * Called to remove a toast.
+     */
     private dismissToast = () => {
         const [, ...toasts] = this.state.toasts;
         this.setState({toasts})
     };
 
+    /**
+     * Shows the info dialog box.
+     */
     private showInfo = () => {
         this.setState({showInfo: true})
     };
 
+    /**
+     * Hides the info dialog box.
+     */
     private hideInfo = () => {
         this.setState({showInfo: false})
     };
 
+    /**
+     * Renders the html for the component.
+     * @returns {any} The markup for the component.
+     */
     public render() {
         return (
-
             <div id="app">
                 <Toolbar
                     colored={true}
@@ -134,22 +157,23 @@ export class App extends React.Component<{}, IAppState> {
                     <SearchBox regions={POSTCODES} foundValid={this.updatePostcode} online={this.state.online}/>
                     {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
                     {this.state.postcode ?
-                    <Card className="data">
-                        <TabsContainer
-                            panelClassName="md-grid"
-                            labelAndIcon={true}
-                            colored={true}
-                        >
-                            <Tabs tabId="simple-tab">
-                                <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
-                                    <CrimeList postcode={this.state.postcode}/>
-                                </Tab>
-                                <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
-                                    <BikeList postcode={this.state.postcode}/>
-                                </Tab>
-                            </Tabs>
-                        </TabsContainer>
-                    </Card> : null }
+                        <Card className="data">
+                            <TabsContainer
+                                panelClassName="md-grid"
+                                labelAndIcon={true}
+                                colored={true}
+                            >
+                                <Tabs tabId="simple-tab">
+                                    <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
+                                        <CrimeList postcode={this.state.postcode}/>
+                                    </Tab>
+                                    <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
+                                        <BikeList postcode={this.state.postcode}/>
+                                    </Tab>
+                                </Tabs>
+                            </TabsContainer>
+                        </Card> : null
+                    }
                 </main>
                 <Snackbar
                     id="example"

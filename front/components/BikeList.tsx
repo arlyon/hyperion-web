@@ -1,20 +1,30 @@
 import * as React from "react";
-import {Card, CardTitle, CardText, TextField, Toolbar} from 'react-md';
+import {Card, CardTitle, CardText, TextField} from 'react-md';
+import {IBikeTheft} from '../interfaces/BikeTheft'
 import {MessageBox} from "./Message";
 
+/**
+ * Given a postcode, fetches a list of stolen bikes nearby.
+ */
 export class BikeList extends React.Component <{ postcode }, { bikes: any[], search: string }> {
     constructor(props: { postcode }) {
         super(props);
+
         this.state = {
             bikes: [],
             search: "",
         };
+
         if (this.props.postcode) {
             this.fetchData(this.props.postcode);
         }
-
     }
 
+    /**
+     * Called when the component will receive new props and compares them
+     * with the old props to determine if more bikes should be fetched.
+     * @param {Readonly<P>} nextProps The next props from the server.
+     */
     public componentWillReceiveProps(nextProps) {
         if (nextProps.postcode !== this.props.postcode) { //new props object
             //If postcode is null
@@ -35,13 +45,20 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
         this.setState({bikes: await response.json()})
     }
 
+    /**
+     * Called when the filter input updates to make the component controlled.
+     * @param {string} value The new value of the input box.
+     */
     updateSearch = (value: string) => {
         this.setState({search: value});
     };
 
+    /**
+     * Renders the component.
+     * @returns {HTMLElement} The markup for the component.
+     */
     render() {
-
-        const bikeFilter = (bike): boolean => {
+        const bikeFilter = (bike: IBikeTheft): boolean => {
             if (this.state.search === "") {
                 return true; //Display all if search is empty
             }
@@ -56,6 +73,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
             }
             return false
         };
+
         const bikeMarkUp = this.state.bikes
             .filter(bikeFilter) //passes bike as parameter to function BikeFilter
             .map((stolenBike, index) => <Bike key={index} {...stolenBike} />);
@@ -63,7 +81,13 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
         return (
             this.state.bikes.length ? (
                 <section className="bikecontainer">
-                    <TextField id="bikefilter" placeholder="Filter..." customSize="title" value={this.state.search} onChange={this.updateSearch} />
+                    <TextField
+                        id="bikefilter"
+                        placeholder="Filter..."
+                        customSize="title"
+                        value={this.state.search}
+                        onChange={this.updateSearch}
+                    />
                     {bikeMarkUp.length ? bikeMarkUp : <MessageBox message="No Matching Bikes"/>}
                 </section>
             ) : <MessageBox message="No Thefts In Your Area"/>
@@ -71,22 +95,15 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
     }
 }
 
-interface IBikeTheft {
-    make?: string,
-    model?: string,
-    colour?: string,
-    latitude?: number,
-    longitude?: number,
-    frame_number?: string | null,
-    rfid?: string | null,
-    description?: null | string,
-    reported_at?: string | null,
-}
-
-function Bike(props: IBikeTheft) {
+/**
+ * A Component that shows the info for a stolen bike.
+ * @param {IBikeTheft} stolenBike A stolen bike.
+ * @returns {HTMLElement} The markup for the component.
+ */
+function Bike(stolenBike: IBikeTheft) {
     const propsNew = {} as IBikeTheft;
-    for (let x of Object.keys(props)) {
-        propsNew[x] = props[x] || "N/A"
+    for (let x of Object.keys(stolenBike)) {
+        propsNew[x] = stolenBike[x] || "N/A"
     }
     return (
         <Card className="bikecard">

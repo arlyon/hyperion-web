@@ -12,18 +12,24 @@ import {INeighbourhood} from "../interfaces/Neighbourhood";
 import {Twitter} from "./Twitter";
 import {HyperLinkListItem} from "./HyperLinkListItem";
 
+/**
+ * The props for postcode data.
+ */
+export interface IPostCodeDataProps {
+    postcode: string
+}
+
+/**
+ * The state for the post code data props.
+ */
 interface IPostCodeDataState {
     nearby: any[],
     neighbourhood: INeighbourhood | null,
     address: IAddress | null
 }
 
-export interface IPostCodeDataProps {
-    postcode: string
-}
-
 /**
- * PostCodeData shows data about a specific location.
+ * Given a postcode, lists data about the local area.
  */
 export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeDataState> {
 
@@ -31,7 +37,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * Creates a new instance of the PostCodeData component.
      * @param props The properties for the component.
      */
-    constructor(props: { postcode: string }) {
+    constructor(props: IPostCodeDataProps) {
         super(props);
         this.state = {
             nearby: [],
@@ -48,11 +54,9 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
     /**
      * Checks for a change in post code and clears or
      * updates the data if it is needed.
-     * @param {Readonly<P>} nextProps
+     * @param {Readonly<P>} nextProps The next props.
      */
     public componentWillReceiveProps(nextProps) {
-
-        console.log("new props", nextProps, this.props)
         if (this.props.postcode !== nextProps.postcode) {
             if (nextProps.postcode === null) {
                 this.setState({
@@ -114,10 +118,6 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
  */
 const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
 
-    /**
-     * Creates LinkedListItems for each nearby wikipedia entry.
-     * @type {HTMLElement[]}
-     */
     const nearby = props.nearby.map((item, index) => (
         <HyperLinkListItem
             key={index}
@@ -153,7 +153,6 @@ const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
 /**
  * Displays information about a police neighbourhood.
  * @param props The props for the component.
- * @constructor
  */
 class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[] }> {
     constructor(props: { neighbourhood: any }) {
@@ -163,8 +162,8 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
             tweets: []
         };
 
-        const twitter_handle = PoliceInfo.getTwitterHandle(this.props.neighbourhood.twitter)
-        if (twitter_handle) this.fetchData(twitter_handle)
+        const twitter_handle = PoliceInfo.getHandle(this.props.neighbourhood.twitter);
+        if (twitter_handle) this.fetchData(twitter_handle);
     }
 
     /**
@@ -176,43 +175,54 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
         this.setState({tweets: await response.json()})
     }
 
-    private static getTwitterHandle(url: string) {
+    /**
+     * Given a url with a facebook/twitter handle, returns the handle.
+     * @param {string} url The url to parse.
+     * @returns {string} The facebook handle.
+     */
+    private static getHandle(url: string): string | null {
         if (url) {
-            const twitter_parts = url.split("/");
-            return twitter_parts.pop() || twitter_parts.pop(); // trailing slash
+            const parts = url.split("/");
+            const handle = parts.pop() || parts.pop(); // trailing slash
+            return  handle ? handle : null // handle could be undefined. if it is set it to null
         }
         return null;
     }
 
-    private static getFacebookHandle(url: string) {
-        if (url) {
-            const facebook_parts = url.split("/");
-            return facebook_parts.pop() || facebook_parts.pop(); // trailing slash
-        }
-        return null;
-    }
-
+    /**
+     * Given some input html, it creates a dom element
+     * and gets the innerText, wiping out the html tags.
+     * @param {string} html The html to strip.
+     * @returns {string} The cleaned text.
+     */
     private static cleanHTMLTags(html: string) {
         const parsed_text = document.createElement("div");
         parsed_text.innerHTML = html;
-        console.log(parsed_text.innerText, html)
         return parsed_text.innerText
     }
 
+    /**
+     * Called when the component get its props.
+     * @param {Readonly<P>} nextProps The next props.
+     */
     public componentWillReceiveProps(nextProps) {
         if (nextProps.neighbourhood.twitter !== this.props.neighbourhood.twitter) {
             if (nextProps.neighbourhood.twitter === null) {
                 this.setState({tweets: []})
             } else {
-                const twitter_handle = PoliceInfo.getTwitterHandle(nextProps.neighbourhood.twitter);
+                const twitter_handle = PoliceInfo.getHandle(nextProps.neighbourhood.twitter);
                 if (twitter_handle) this.fetchData(twitter_handle);
             }
         }
     }
 
+    /**
+     * Renders the html for the component.
+     * @returns {any} The markup for the component.
+     */
     public render() {
-        const facebook_handle = PoliceInfo.getFacebookHandle(this.props.neighbourhood.facebook)
-        const twitter_handle = PoliceInfo.getTwitterHandle(this.props.neighbourhood.twitter);
+        const facebook_handle = PoliceInfo.getHandle(this.props.neighbourhood.facebook)
+        const twitter_handle = PoliceInfo.getHandle(this.props.neighbourhood.twitter);
 
         const description = this.props.neighbourhood.description ?
             <CardText><p>{PoliceInfo.cleanHTMLTags(this.props.neighbourhood.description)}</p></CardText> :

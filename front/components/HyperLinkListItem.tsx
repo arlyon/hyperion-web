@@ -4,7 +4,7 @@ import {ListItem, ListItemProps} from "react-md";
 /**
  * Extends the ListItem to also define an href.
  */
-interface LinkedListItemProps extends ListItemProps {
+export interface LinkedListItemProps extends ListItemProps {
     href: string;
     newtab?: boolean;
 }

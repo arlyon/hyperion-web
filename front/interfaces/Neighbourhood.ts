@@ -1,3 +1,6 @@
+/**
+ * An interface for neighbourhood data from the police API.
+ */
 export interface INeighbourhood {
     code: string;
     email: string | null;
