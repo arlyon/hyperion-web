@@ -3,7 +3,6 @@ import {
     Button,
     Autocomplete,
 } from "react-md";
-import config from '../config';
 
 /**
  * The internal state for the search box.
@@ -78,7 +77,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         if (this.state.error !== value) {
             this.setState({error: value});
             if (value === true) {
-                navigator.vibrate(config.vibrateOnError);
+                navigator.vibrate(300);
             }
         }
     };

@@ -4,11 +4,12 @@
   "description": "## useful articles",
   "main": "./front/app.ts",
   "scripts": {
-    "build": "node ./node_modules/webpack/bin/webpack.js",
-    "build:min": "node ./node_modules/webpack/bin/webpack.js --optimize-minimize",
-    "watch": "node ./node_modules/webpack/bin/webpack.js --watch",
-    "server": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
-    "docs": "node ./node_modules/typedoc/bin/typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/"
+    "prod": "webpack -p --config webpack.prod.js",
+    "dev": "webpack --config webpack.dev.js",
+    "watch": "webpack --config webpack.dev.js --watch",
+    "server": "webpack-dev-server --hot",
+    "docs": "typedoc --out ./docs/ --target ES6 --module commonjs --name 'Crime Tracker' --hideGenerator ./front/",
+    "heroku-postbuild": "webpack -p --config ./webpack.prod.js --progress"
   },
   "repository": {
     "type": "git",
@@ -38,13 +39,15 @@
     "tslint-react": "^3.2.0",
     "typedoc": "^0.9.0",
     "typescript": "^2.6.1",
+    "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.4"
+    "webpack-dev-server": "^2.9.4",
+    "webpack-merge": "^4.1.1"
   },
   "dependencies": {
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-hot-loader": "^3.1.3",
-    "react-md": "^1.2.8"
+    "react-md": "^1.2.9"
   }
 }

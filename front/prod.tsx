@@ -1,8 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import {AppContainer} from "react-hot-loader"
 import {App} from './app'
-import config from "./config";
 
 /**
  * Given a react component, renders it to the page.
@@ -10,20 +8,13 @@ import config from "./config";
  */
 const render = (Component: any) => {
     ReactDOM.render(
-        <AppContainer>
-            <Component/>
-        </AppContainer>,
+        <Component/>,
         document.getElementById('root'),
     )
 };
 
 async function start() {
     render(App);
-
-    // Webpack Hot Module Replacement API
-    if ((module as any).hot) {
-        (module as any).hot.accept('./app', () => render(App));
-    }
 
     /*
     // Check for browser support of service worker
