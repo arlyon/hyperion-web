@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "## useful articles",
   "main": "./front/app.ts",
+  "engines": {
+    "node": "9.x.x"
+  },
   "scripts": {
     "prod": "webpack -p --config webpack.prod.js",
     "dev": "webpack --config webpack.dev.js",
