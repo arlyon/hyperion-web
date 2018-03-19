@@ -115,6 +115,7 @@ export class App extends React.Component<{}, IAppState> {
                     title="Crime Checker"
                     actions={<Button icon={true} onClick={this.showInfo}>info</Button>}
                     component="nav"
+                    fixed={true}
                 />
                 <DialogContainer
                     id="info-box"

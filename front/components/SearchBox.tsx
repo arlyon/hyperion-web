@@ -119,7 +119,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     /**
      * Gets the autocomplete data from the server.
      * @returns {Promise<void>} Returns nothing.
-     * TODO calculating the bold doesn't take spaces into account. can lead to malformed highlighting
      */
     private getAutoCompleteForPostcode = async (searchString: string, online = this.props.online) => {
         if (!online) return;
@@ -127,16 +126,21 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete`);
         const postcodes = (await autocomplete_lookup.json())["result"] || [];
 
-        const processed = postcodes.map((next) => ({
-            label: [
-                <span key="bold" className="md-font-bold">{next.substring(0, searchString.length)}</span>,
-                next.substring(searchString.length),
-            ],
-            value: next
-        }));
+        const autoComplete = postcodes.map((autoComplete) => {
+
+            const highlightLength = this.getHighlightLength(searchString, autoComplete);
+
+            return {
+                label: [
+                    <span key="bold" className="md-font-bold">{autoComplete.substring(0, highlightLength)}</span>,
+                    autoComplete.substring(highlightLength),
+                ],
+                value: autoComplete
+            };
+        });
 
         this.setState({
-            autoComplete: processed, // make sure it's not null
+            autoComplete, // make sure it's not null
         });
 
         this.setError(postcodes.length === 0);
@@ -145,6 +149,33 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             this.props.foundValid(postcodes[0])
         }
     };
+
+    /**
+     * Given a search string and an autocomplete text returns an index
+     * to highlight to on the autoComplete string respecting spaces on both.
+     * @param search
+     * @param autoComplete
+     */
+    private getHighlightLength = (search, autoComplete) => {
+        let count1 = 0;
+        let count2 = 0;
+
+        while (count1 < search.length) {
+            if (autoComplete[count2] == ' ')
+                count2 += 1;
+            else if (search[count1] == ' ')
+                count1 += 1;
+            else if (search[count1] != autoComplete[count2])
+                return count2;
+            else {
+                count2 += 1;
+                count1 += 1;
+            }
+        }
+
+        return count2
+    };
+
 
     /**
      * Gets the region and looks up the postcode.
