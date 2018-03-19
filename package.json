@@ -1,7 +1,7 @@
 {
   "name": "CrimeTracker",
   "version": "1.0.0",
-  "description": "## useful articles",
+  "description": "Data about crime in the UK.",
   "main": "./front/app.ts",
   "engines": {
     "node": "9.x.x"
