@@ -1,18 +1,16 @@
-# crimechecker
+# Hyperion Web
 
-Crimechecker is a PWA and Flask API that facilitates searching for crime data
-at a specific post code in the UK.
+Hyperion Web is a PWA front end for [hyperion][1]
+that facilitates searching for crime data at a specific post code in the UK.
 
 ### Getting Started
 
-**Setting up the API** is easy, simply deploy the python API in any way you like. The app
-will need some time to cache requests when newly deployed so it may execute
-a few requests slowly to start with.
+**Setting up the API** is easy, simply head over to [hyperion][1] and follow the instructions.
+A useful setting is `--cross-origin` which is required to access the API from other urls.
 
-API Docs: https://documenter.getpostman.com/view/3008197/crime-tracker/7EHaWs8
-
-**The PWA** is built with webpack. To point it to your deployed API, change the `API_URL`
-variable in `webpack.prod.js` to the root address.
+**Building the PWA** is done with webpack. First, point it to your deployed API by changing the 
+`API_URL` variable in `webpack.prod.js` to the root address. Then, simply run `yarn build` and 
+copy the files in the `public` directory to your web server of choice (netlify maybe?)
 
 ### Contributing
 
@@ -25,20 +23,4 @@ state and any improvements to the API or web app is welcome. Some suggestions:
 Simply fork the repo and start working on changes in a new branch. When the change or
 feature is ready, open a pull request.
 
-### Data
-
-#### Sources
-
-Data is aggregated and cached from the following sources:
-
-- BikeRegister
-- UK Police
-- Google maps
-- Twitter RSS
-- UK Postcodes
-- Wikipedia
-
-#### Limitations
-
-Crime data is limited in Scotland due to the scottish police opting
-out when it comes to the API. However bike theft is still available.
+[1]: https://github.com/arlyon/hyperion
