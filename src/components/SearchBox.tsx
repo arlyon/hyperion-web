@@ -191,7 +191,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         return (
             <Autocomplete
                 id="search"
-                label={this.state.region || "Search For A Postcode"}
+                label={this.state.region || "Enter a Postcode"}
                 inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
                 customSize="title"
                 filter={null}

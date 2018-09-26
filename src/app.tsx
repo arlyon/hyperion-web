@@ -154,8 +154,7 @@ export class App extends React.Component<{}, IAppState> {
                     </ul>
                 </DialogContainer>
                 <main>
-                    <h1 id="title" className="title">Find Crime Near You</h1>
-                    <SearchBox regions={POSTCODES} foundValid={this.updatePostcode} online={this.state.online}/>
+                    <SearchBox regions={POSTCODES} alertValid={this.updatePostcode} online={this.state.online}/>
                     {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
                     {this.state.postcode ?
                         <Card className="data">
