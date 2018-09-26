@@ -83,7 +83,8 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             this.setState({
                 region: null,
                 searchString: "",
-                autoComplete: []
+                autoComplete: [],
+                error: false,
             })
         } else {
             const region = this.getRegionNameForPostcode(searchString);
