@@ -34,16 +34,17 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     constructor(props: ISearchProps) {
         super(props);
 
-        const search = localStorage.getItem("search");
+        let search = localStorage.getItem("search");
+        search = search ? search : "";
 
         this.state = {
             searchString: search ? search : "",
             error: false,
-            region: "",
+            region: this.getRegionNameForPostcode(search),
             autoComplete: [],
         };
 
-        if (search) {
+        if (!!search) {
             this.getAutoCompleteForPostcode(search)
         }
     }
@@ -84,15 +85,26 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     private handleSearchUpdate = async (searchString: string) => {
         searchString = searchString.toUpperCase();
-        if (searchString.length == 0) this.props.alertValid("");
+        if (searchString.length == 0) {
+            this.props.alertValid("");
+            this.setState({
+                region: null,
+                searchString: "",
+                autoComplete: []
+            })
+        } else {
+            const region = this.getRegionNameForPostcode(searchString);
+            if (!!region && searchString != this.state.searchString) this.getAutoCompleteForPostcode(searchString);
+            searchString = region === undefined ? this.state.searchString : searchString;
 
-        const region = this.getRegionNameForPostcode(searchString);
-        if (!!region && searchString != this.state.region) this.getAutoCompleteForPostcode(searchString);
-        this.setError(region === undefined);
-        this.setState({
-            region: region === undefined ? this.state.region : region,
-            searchString: region === undefined ? this.state.searchString : searchString,
-        });
+            this.setError(region === undefined);
+            this.setState({
+                region: region === undefined ? this.state.region : region,
+                searchString: searchString,
+            });
+        }
+
+        localStorage.setItem("search", searchString);
     };
 
     /**
@@ -103,6 +115,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         if (this.state.searchString !== clickedValue) {
             this.setState({searchString: clickedValue, autoComplete: [], error: false});
             this.props.alertValid(clickedValue);
+            localStorage.setItem("search", clickedValue);
         }
     };
 
@@ -128,7 +141,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         });
 
         // if there is one exact match, show no autocomplete, and tell the parent
-        if (autoComplete.length === 1 && searchString === autoComplete[0].value.replace(" ", "")) {
+        if (autoComplete.length === 1 && searchString.replace(" ", "") === autoComplete[0].value.replace(" ", "")) {
             this.setState({autoComplete: []});
             this.props.alertValid(postcodes[0]);
         } else {
