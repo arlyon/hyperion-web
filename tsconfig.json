@@ -1,14 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./back/static/",
-    "rootDir": "./front/",
     "sourceMap": true,
     "module": "es6",
     "jsx": "react",
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "lib": ["es6", "dom"],
     "removeComments": true,
     "target": "es5",
     "moduleResolution": "node",
@@ -19,10 +14,6 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false
   },
-  "include": [
-    "./front/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules"]
 }

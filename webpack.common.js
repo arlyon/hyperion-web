@@ -1,9 +1,11 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
 module.exports = {
 
     // set output to app.js
     output: {
         filename: "app.js",
-        path: __dirname + "/back/static/"
+        path: __dirname + "/public/"
     },
 
     // add additional extensions to resolve
@@ -29,7 +31,12 @@ module.exports = {
     // allows us to not have react bundled
     externals: {
         "react": "React",
-        "react-dom": "ReactDOM"
+        "react-dom": "ReactDOM",
+        "react-md": "ReactMD"
     },
+
+    plugins: [
+        new CopyWebpackPlugin([{from: "src/static", to: "."}])
+    ]
 
 };
