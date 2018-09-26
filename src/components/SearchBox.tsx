@@ -5,24 +5,22 @@ import {
 } from "react-md";
 
 /**
+ * The interface for the search box props..
+ */
+export interface ISearchProps {
+    regions: { [prefix: string]: string };
+    alertValid: (postcode: string) => void;
+    online: boolean;
+}
+
+/**
  * The internal state for the search box.
  */
 interface ISearchState {
     searchString: string,
     error: boolean,
-    region: string | null,
+    region: string | null | undefined,
     autoComplete: any[],
-}
-
-/**
- * The interface for the search props.
- */
-export interface ISearchProps {
-    regions: {
-        [prefix: string]: string
-    };
-    foundValid: (postcode: string) => void;
-    online: boolean;
 }
 
 /**
@@ -51,13 +49,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     }
 
     /**
-     * Manually calls the foundValid function with the current search string.
-     */
-    private submitPostcode = () => {
-        this.props.foundValid(this.state.searchString)
-    };
-
-    /**
      * Updates the autocomplete when the client goes online/offline.
      * @param {Readonly<P>} props The new props for the component.
      */
@@ -70,49 +61,48 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     }
 
     /**
-     * Sets the error state and vibrates the device.
-     * @param {boolean} value
+     * Manually calls the alertValid function with the current search string.
      */
-    private setError = (value: boolean) => {
-        if (this.state.error !== value) {
-            this.setState({error: value});
-            if (value === true) {
-                navigator.vibrate(300);
-            }
+    private submitPostcode = () => {
+        this.props.alertValid(this.state.searchString)
+    };
+
+    /**
+     * Sets the error state and vibrates the device if needed.
+     * @param state The new error state.
+     */
+    private setError = (state: boolean) => {
+        if (this.state.error !== state) {
+            this.setState({error: state});
+            if (state) navigator.vibrate(300);
         }
     };
 
     /**
-     * The update search event handler.
+     * Handles changes to the search bar, updating the autocomplete and error.
      * @param searchString
      */
     private handleSearchUpdate = async (searchString: string) => {
         searchString = searchString.toUpperCase();
+        if (searchString.length == 0) this.props.alertValid("");
 
-        if (searchString.length == 0) {
-            this.props.foundValid("")
-        }
-
-        const regionName = this.getRegionForPostcode(searchString);
-        localStorage.setItem("search", searchString);
-
+        const region = this.getRegionNameForPostcode(searchString);
+        if (!!region && searchString != this.state.region) this.getAutoCompleteForPostcode(searchString);
+        this.setError(region === undefined);
         this.setState({
-            searchString,
-            region: regionName
+            region: region === undefined ? this.state.region : region,
+            searchString: region === undefined ? this.state.searchString : searchString,
         });
-
-        this.setError(searchString !== "" && regionName === undefined);
-        if (searchString !== "" && (regionName !== undefined || searchString.length == 1)) this.getAutoCompleteForPostcode(searchString);
     };
 
     /**
-     * Manages the autocomplete click event.
+     * Handles the selection of an autocomplete entry.
      * @param clickedValue The value that was clicked on.
      */
     private handleAutoComplete = (clickedValue: string) => {
         if (this.state.searchString !== clickedValue) {
-            this.setState({searchString: clickedValue});
-            this.props.foundValid(clickedValue);
+            this.setState({searchString: clickedValue, autoComplete: [], error: false});
+            this.props.alertValid(clickedValue);
         }
     };
 
@@ -122,12 +112,10 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     private getAutoCompleteForPostcode = async (searchString: string, online = this.props.online) => {
         if (!online) return;
-
-        const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete`);
+        const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete/`);
         const postcodes = (await autocomplete_lookup.json())["result"] || [];
 
         const autoComplete = postcodes.map((autoComplete) => {
-
             const highlightLength = this.getHighlightLength(searchString, autoComplete);
 
             return {
@@ -139,15 +127,15 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             };
         });
 
-        this.setState({
-            autoComplete, // make sure it's not null
-        });
+        // if there is one exact match, show no autocomplete, and tell the parent
+        if (autoComplete.length === 1 && searchString === autoComplete[0].value.replace(" ", "")) {
+            this.setState({autoComplete: []});
+            this.props.alertValid(postcodes[0]);
+        } else {
+            this.setState({autoComplete,});
+        }
 
         this.setError(postcodes.length === 0);
-
-        if (postcodes.length === 1) {
-            this.props.foundValid(postcodes[0])
-        }
     };
 
     /**
@@ -178,14 +166,21 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
 
 
     /**
-     * Gets the region and looks up the postcode.
-     * @param {string} searchString
-     * @returns {string | null} The region.
+     * Returns the region name associated with the given postcode.
+     * @param {string} postcode
+     * @returns The region name, null if the postcode was empty, or undefined if the region does not exist.
      */
-    private getRegionForPostcode(searchString: string): string | null {
+    private getRegionNameForPostcode(postcode: string): string | null | undefined {
+        if (postcode === "") return null;
         const re = /^([A-Z]{1,2})([0-9]?[A-Z]?[0-9 ]{0,3}[A-Z]{0,2})$/;
-        const match = re.exec(searchString);
-        return match ? this.props.regions[match[1]] : null;
+        const match = re.exec(postcode);
+        if (!match) return undefined;
+
+        const region_pairs = Object.entries(this.props.regions)
+            .filter(([key, _]) => key.indexOf(match[1]) === 0);
+
+        if (!region_pairs.length) return undefined;
+        else return region_pairs.reduce((smallest, current) => current[0] < smallest[0] ? current : smallest)[1];
     }
 
     /**

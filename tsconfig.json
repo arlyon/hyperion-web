@@ -3,7 +3,7 @@
     "sourceMap": true,
     "module": "es6",
     "jsx": "react",
-    "lib": ["es6", "dom"],
+    "lib": ["es2017", "dom"],
     "removeComments": true,
     "target": "es5",
     "moduleResolution": "node",
