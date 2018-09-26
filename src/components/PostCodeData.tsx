@@ -76,7 +76,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      */
     private fetchNearbyLocations = async (postcode: string) => {
         const request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/nearby/`);
-        this.setState({nearby: await request.json()})
+        this.setState({nearby: request.status == 200 ? await request.json() : []})
     };
 
     /**
@@ -85,18 +85,13 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private getLocalDataForPostcode = async (postcode: string) => {
-        const address_request = fetch(`${process.env.API_URL}/api/postcode/${postcode}/`);
-        const neighbourhood_request = fetch(`${process.env.API_URL}/api/postcode/${postcode}/neighbourhood/`);
+        const address_request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/`);
+        const neighbourhood_request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/neighbourhood/`);
 
-        const [address, neighbourhood] = await Promise.all([
-            (await address_request).json(),
-            (await neighbourhood_request).json()
-        ]);
+        const address = address_request.status == 200 ? await address_request.json() : null;
+        const neighbourhood = neighbourhood_request.status == 200 ? await neighbourhood_request.json() : null;
 
-        this.setState({
-            address: address.message ? null : address,
-            neighbourhood: neighbourhood.message ? null : neighbourhood,
-        })
+        this.setState({address, neighbourhood,})
     };
 
     /**
@@ -174,7 +169,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
      */
     private async fetchData(twitterHandle: string) {
         const response = await fetch(`${process.env.API_URL}/api/twitter/${twitterHandle}/`);
-        this.setState({tweets: await response.json()})
+        this.setState({tweets: response.status == 200 ? await response.json() : []})
     }
 
     /**
@@ -186,7 +181,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
         if (url) {
             const parts = url.split("/");
             const handle = parts.pop() || parts.pop(); // trailing slash
-            return  handle ? handle : null // handle could be undefined. if it is set it to null
+            return handle ? handle : null // handle could be undefined. if it is set it to null
         }
         return null;
     }

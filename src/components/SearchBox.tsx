@@ -119,7 +119,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     private getAutoCompleteForPostcode = async (searchString: string, online = this.props.online) => {
         if (!online) return;
         const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete/`);
-        const postcodes = (await autocomplete_lookup.json())["result"] || [];
+        const postcodes = autocomplete_lookup.status == 200 ? (await autocomplete_lookup.json())["result"] : [];
 
         const autoComplete = postcodes.map((autoComplete) => {
             const highlightLength = this.getHighlightLength(searchString, autoComplete);

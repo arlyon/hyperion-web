@@ -57,7 +57,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
      */
     private async fetchData(postcode) {
         const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/crime/`);
-        this.setState({crimes: await response.json()});
+        this.setState({crimes: response.status == 200 ? await response.json() : []});
     }
 
     /**

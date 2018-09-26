@@ -43,7 +43,7 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
      */
     private async fetchData(postcode: string) {
         const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/bikes/`);
-        this.setState({bikes: await response.json()})
+        this.setState({bikes: response.status == 200 ? await response.json() : []})
     }
 
     /**
