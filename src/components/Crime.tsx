@@ -56,7 +56,7 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
      * @returns {Promise<void>} Returns nothing.
      */
     private async fetchData(postcode) {
-        const response = await fetch(`${process.env.API_URL}/api/crime/${postcode}`);
+        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/crime/`);
         this.setState({crimes: await response.json()});
     }
 

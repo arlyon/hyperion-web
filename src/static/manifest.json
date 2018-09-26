@@ -1,0 +1,27 @@
+{
+  "name": "Hyperion Crime Watch",
+  "short_name": "Hyperion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#673ab7",
+  "orientation": "portrait-primary",
+  "description": "Simply check crime in your local area.",
+  "icons": [{
+    "src": "/static/fingerprint72.png",
+    "sizes": "72x72",
+    "type": "image/png"
+  }, {
+    "src": "/static/fingerprint144.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  }, {
+    "src": "/static/fingerprint288.png",
+    "sizes": "288x288",
+    "type": "image/png"
+  }, {
+    "src": "/static/fingerprint512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }]
+}

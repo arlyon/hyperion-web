@@ -75,7 +75,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private fetchNearbyLocations = async (postcode: string) => {
-        const request = await fetch(`${process.env.API_URL}/api/nearby/${postcode}`);
+        const request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/nearby/`);
         this.setState({nearby: await request.json()})
     };
 
@@ -85,8 +85,8 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private getLocalDataForPostcode = async (postcode: string) => {
-        const address_request = fetch(`${process.env.API_URL}/api/postcode/${postcode}`);
-        const neighbourhood_request = fetch(`${process.env.API_URL}/api/neighbourhood/${postcode}`);
+        const address_request = fetch(`${process.env.API_URL}/api/postcode/${postcode}/`);
+        const neighbourhood_request = fetch(`${process.env.API_URL}/api/postcode/${postcode}/neighbourhood/`);
 
         const [address, neighbourhood] = await Promise.all([
             (await address_request).json(),
@@ -173,7 +173,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
      * @returns {Promise<void>} Returns nothing.
      */
     private async fetchData(twitterHandle: string) {
-        const response = await fetch(`${process.env.API_URL}/api/rss/${twitterHandle}`);
+        const response = await fetch(`${process.env.API_URL}/api/twitter/${twitterHandle}/`);
         this.setState({tweets: await response.json()})
     }
 

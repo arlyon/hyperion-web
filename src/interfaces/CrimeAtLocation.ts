@@ -1,5 +1,5 @@
 /**
- * The interface for the api response for crime data.
+ * The interface for the fetch response for crime data.
  */
 interface ICrimeAtLocation {
   age_range: string;

@@ -112,7 +112,7 @@ export class App extends React.Component<{}, IAppState> {
             <div id="app">
                 <Toolbar
                     colored={true}
-                    title="Crime Checker"
+                    title="Hyperion"
                     actions={<Button icon={true} onClick={this.showInfo}>info</Button>}
                     component="nav"
                     fixed={true}
