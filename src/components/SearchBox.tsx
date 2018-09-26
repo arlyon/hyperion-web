@@ -62,13 +62,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     }
 
     /**
-     * Manually calls the alertValid function with the current search string.
-     */
-    private submitPostcode = () => {
-        this.props.alertValid(this.state.searchString)
-    };
-
-    /**
      * Sets the error state and vibrates the device if needed.
      * @param state The new error state.
      */
@@ -205,7 +198,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
             <Autocomplete
                 id="search"
                 label={this.state.region || "Enter a Postcode"}
-                inlineIndicator={<Button icon={true} onClick={this.submitPostcode}>search</Button>}
+                inlineIndicator={<Button icon={true} disabled={true}>search</Button>}
                 customSize="title"
                 filter={null}
                 data={this.state.autoComplete}
