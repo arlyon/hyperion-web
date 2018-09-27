@@ -9,7 +9,7 @@ import {
  */
 export interface ISearchProps {
     regions: { [prefix: string]: string };
-    alertValid: (postcode: string) => void;
+    alertValid: (postcode: string, valid: boolean) => void;
     online: boolean;
 }
 
@@ -78,8 +78,9 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     private handleSearchUpdate = async (searchString: string) => {
         searchString = searchString.toUpperCase();
+
         if (searchString.length == 0) {
-            this.props.alertValid("");
+            this.props.alertValid(searchString, false);
             this.setState({
                 region: null,
                 searchString: "",
@@ -108,7 +109,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     private handleAutoComplete = (clickedValue: string) => {
         if (this.state.searchString !== clickedValue) {
             this.setState({searchString: clickedValue, autoComplete: [], error: false});
-            this.props.alertValid(clickedValue);
+            this.props.alertValid(clickedValue, true);
             localStorage.setItem("search", clickedValue);
         }
     };
@@ -119,10 +120,11 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
      */
     private getAutoCompleteForPostcode = async (searchString: string, online = this.props.online) => {
         if (!online) return;
+
         const autocomplete_lookup = await fetch(`https://api.postcodes.io/postcodes/${searchString}/autocomplete/`);
         const postcodes = autocomplete_lookup.status == 200 ? (await autocomplete_lookup.json())["result"] : [];
 
-        const autoComplete = postcodes.map((autoComplete) => {
+        const autoComplete = postcodes.length ? postcodes.map((autoComplete) => {
             const highlightLength = this.getHighlightLength(searchString, autoComplete);
 
             return {
@@ -132,14 +134,17 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
                 ],
                 value: autoComplete
             };
-        });
+        }) : [];
 
-        // if there is one exact match, show no autocomplete, and tell the parent
+        // if there is one exact match, show no autocomplete and tell the parent we have a match
         if (autoComplete.length === 1 && searchString.replace(" ", "") === autoComplete[0].value.replace(" ", "")) {
             this.setState({autoComplete: []});
-            this.props.alertValid(postcodes[0]);
-        } else {
+            this.props.alertValid(postcodes[0], true);
+        }
+        // otherwise show the autocomplete and tell the parent we no longer have a match
+        else {
             this.setState({autoComplete,});
+            this.props.alertValid(searchString, false);
         }
 
         this.setError(postcodes.length === 0);
