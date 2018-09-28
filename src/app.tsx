@@ -47,7 +47,21 @@ export class App extends React.Component<{}, IAppState> {
         window.addEventListener("online", () => {
             this.setState({online: true});
             this.addToast("Reconnected. Functionality restored.");
-        })
+        });
+
+        {
+            const secret = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a", "Enter"];
+            let recentKeys: string[] = [];
+            window.addEventListener("keydown", (event) => {
+                if (secret[recentKeys.length] === event.key) recentKeys.push(event.key);
+                else recentKeys = [];
+
+                if (secret.length == recentKeys.length) {
+                    console.log("Konami!");
+                    recentKeys = [];
+                }
+            })
+        }
     }
 
     /**
