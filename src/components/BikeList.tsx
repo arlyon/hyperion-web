@@ -1,14 +1,18 @@
 import * as React from "react";
-import {Card, CardTitle, CardText, TextField} from 'react-md';
+import {Card, CardText, CardTitle, TextField} from 'react-md';
 import {IBikeTheft} from '../interfaces/BikeTheft'
 import {MessageBox} from "./Message";
+
+interface IBikeListProps {
+    postcode: string
+}
 
 /**
  * Given a postcode, fetches a list of stolen bikes nearby.
  */
-export class BikeList extends React.Component <{ postcode }, { bikes: any[], search: string }> {
+export class BikeList extends React.Component <IBikeListProps, { bikes: any[], search: string }> {
 
-    constructor(props: { postcode }) {
+    constructor(props: IBikeListProps) {
         super(props);
 
         this.state = {
@@ -24,16 +28,11 @@ export class BikeList extends React.Component <{ postcode }, { bikes: any[], sea
     /**
      * Called when the component will receive new props and compares them
      * with the old props to determine if more bikes should be fetched.
-     * @param {Readonly<P>} nextProps The next props from the server.
+     * @param next The next props from the server.
      */
-    public componentWillReceiveProps(nextProps) {
-        if (nextProps.postcode !== this.props.postcode) { //new props object
-            //If postcode is null
-            if (nextProps.postcode === null) {
-                //Remove all displayed data by setting bike state to empty list
-                this.setState({bikes: []})
-            } //if its not null we want to display all information about that postcode
-            this.fetchData(nextProps.postcode);
+    public componentWillReceiveProps(next: IBikeListProps) {
+        if (next.postcode !== this.props.postcode && next.postcode !== null) {
+            this.fetchData(next.postcode);
         }
     }
 

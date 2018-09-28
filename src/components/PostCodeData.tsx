@@ -1,22 +1,18 @@
 import * as React from "react";
-import {
-    Card,
-    Button,
-    CardTitle,
-    CardText,
-    List,
-    CardActions,
-} from "react-md";
+import {Button, Card, CardActions, CardText, CardTitle, FontIcon, List, Tab, Tabs, TabsContainer,} from "react-md";
 import {IAddress} from "../interfaces/Address";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
 import {Twitter} from "./Twitter";
 import {HyperLinkListItem} from "./HyperLinkListItem";
+import * as CSSTransition from "react-transition-group/CSSTransition";
+import {CrimeList} from "./CrimeList";
+import {BikeList} from "./BikeList";
 
 /**
  * The props for postcode data.
  */
 export interface IPostCodeDataProps {
-    postcode: string
+    postcode: string | null
 }
 
 /**
@@ -52,21 +48,20 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
     }
 
     /**
-     * Checks for a change in post code and clears or
-     * updates the data if it is needed.
-     * @param {Readonly<P>} nextProps The next props.
+     * Checks for a change in post code and updates the data if it is needed.
+     * @param next The new props.
      */
-    public componentWillReceiveProps(nextProps) {
-        if (this.props.postcode !== nextProps.postcode) {
-            if (nextProps.postcode === null) {
-                this.setState({
-                    neighbourhood: null,
-                    address: null
-                })
-            } else {
-                this.fetchNearbyLocations(nextProps.postcode);
-                this.getLocalDataForPostcode(nextProps.postcode);
-            }
+    public componentWillReceiveProps(next: IPostCodeDataProps) {
+        if (this.props.postcode === null && next.postcode !== null) {
+            this.setState({
+                nearby: [],
+                neighbourhood: null,
+                address: null
+            })
+        }
+        if (this.props.postcode !== next.postcode && next.postcode !== null) {
+            this.fetchNearbyLocations(next.postcode);
+            this.getLocalDataForPostcode(next.postcode);
         }
     }
 
@@ -147,12 +142,16 @@ const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
     )
 };
 
+interface IPoliceInfoProps {
+    neighbourhood: any
+}
+
 /**
  * Displays information about a police neighbourhood.
  * @param props The props for the component.
  */
-class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[] }> {
-    constructor(props: { neighbourhood: any }) {
+class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
+    constructor(props: IPoliceInfoProps) {
         super(props);
 
         this.state = {
@@ -200,14 +199,14 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
 
     /**
      * Called when the component get its props.
-     * @param {Readonly<P>} nextProps The next props.
+     * @param next The next props.
      */
-    public componentWillReceiveProps(nextProps) {
-        if (nextProps.neighbourhood.twitter !== this.props.neighbourhood.twitter) {
-            if (nextProps.neighbourhood.twitter === null) {
+    public componentWillReceiveProps(next: IPoliceInfoProps) {
+        if (next.neighbourhood.twitter !== this.props.neighbourhood.twitter) {
+            if (next.neighbourhood.twitter === null) {
                 this.setState({tweets: []})
             } else {
-                const twitter_handle = PoliceInfo.getHandle(nextProps.neighbourhood.twitter);
+                const twitter_handle = PoliceInfo.getHandle(next.neighbourhood.twitter);
                 if (twitter_handle) this.fetchData(twitter_handle);
             }
         }
@@ -218,7 +217,7 @@ class PoliceInfo extends React.Component<{ neighbourhood: any }, { tweets: any[]
      * @returns {any} The markup for the component.
      */
     public render() {
-        const facebook_handle = PoliceInfo.getHandle(this.props.neighbourhood.facebook)
+        const facebook_handle = PoliceInfo.getHandle(this.props.neighbourhood.facebook);
         const twitter_handle = PoliceInfo.getHandle(this.props.neighbourhood.twitter);
 
         const description = this.props.neighbourhood.description ?

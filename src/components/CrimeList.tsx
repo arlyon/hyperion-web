@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-    DataTable,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableColumn,
-} from 'react-md';
+import {DataTable, TableBody, TableColumn, TableHeader, TableRow,} from 'react-md';
 import {MessageBox} from "./Message";
 import {CrimeData} from "../interfaces/Crime";
 
@@ -16,15 +10,19 @@ interface CrimeState {
     crimes: CrimeData[]
 }
 
+interface ICrimeListProps {
+    postcode: string
+}
+
 /**
  * Given a postcode, displays a list of crimes in the area.
  */
-export class CrimeList extends React.Component<{ postcode }, CrimeState> {
+export class CrimeList extends React.Component<ICrimeListProps, CrimeState> {
     /**
      * Instantiates a new instance of the CrimeList component.
-     * @param {{}} props The props (none).
+     * @param props The props.
      */
-    constructor(props: { postcode }) {
+    constructor(props: ICrimeListProps) {
         super(props);
 
         this.state = {
@@ -37,17 +35,12 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
     }
 
     /**
-     * Called when the component get its props.
-     * @param {Readonly<P>} nextProps The next props.
+     * Fetches new data if the postcode changes.
+     * @param props The next props.
      */
-    public componentWillReceiveProps(nextProps) {
-        if (this.props.postcode !== nextProps.postcode) {
-            if (nextProps.postcode === null) {
-                this.setState({crimes: []});
-            }
-            else {
-                this.fetchData(nextProps.postcode);
-            }
+    public componentWillReceiveProps(props: ICrimeListProps) {
+        if (this.props.postcode !== props.postcode && props.postcode !== null) {
+            this.fetchData(props.postcode);
         }
     }
 
@@ -95,17 +88,13 @@ export class CrimeList extends React.Component<{ postcode }, CrimeState> {
      * @returns {HTMLElement} The html for the component.
      */
     render() {
-        const listOfCrimes = this.summarizeCategories(this.state.crimes)
+        const listOfCrimes = this.summarizeCategories(this.state.crimes);
         const crimeSummary = Object.keys(listOfCrimes).map((key, index) => (
             <TableRow key={index}>
                 <TableColumn>{CrimeList.dehyphenate(key)}</TableColumn>
                 <TableColumn>{listOfCrimes[key]}</TableColumn>
             </TableRow>
         ));
-
-        const style = {
-            width: "100%"
-        };
 
         if (crimeSummary.length) {
             return (
