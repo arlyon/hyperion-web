@@ -1,9 +1,6 @@
 import * as React from "react";
-import {Button, Toolbar, Card, Tab, Tabs, TabsContainer, FontIcon, Snackbar, DialogContainer} from "react-md";
-
-import {CrimeList} from "./components/Crime";
+import {Button, DialogContainer, Snackbar, Toolbar} from "react-md";
 import {SearchBox} from "./components/SearchBox";
-import {BikeList} from "./components/BikeList";
 import POSTCODES from "./data/postcodes";
 import './style/main.styl';
 import {PostCodeData} from "./components/PostCodeData";
@@ -140,55 +137,24 @@ export class App extends React.Component<{}, IAppState> {
                     initialFocus="info-box"
                 >
                     <p>
-                        This app uses a set of APIs allow a user to quickly
-                        determine the amount of crime in their local area. To begin, enter a postcode
-                        into the box, and it will begin to suggest postcodes to you.
+                        This app is a frontend for <a href="https://github.com/arlyon/hyperion">hyperion</a>,
+                        a cli tool and api to quickly determine the amount of crime at a given postcode.
                     </p>
-                    <h4><b>Web APIs Used</b></h4>
-                    <ul>
-                        <li>postcodes.io</li>
-                        <li>data.police.uk</li>
-                        <li>bikeregister.com</li>
-                        <li>wikipedia.com</li>
-                        <li>twitter rss feeds</li>
-                    </ul>
                     <h4><b>Frontend Technologies</b></h4>
                     <ul>
                         <li>typescript</li>
-                        <li>react ui library</li>
-                        <li>react-md component library</li>
-                        <li>webpack build tool</li>
+                        <li>react</li>
+                        <li>react-md</li>
+                        <li>webpack</li>
                         <li>stylus</li>
                     </ul>
-                    <h4><b>Backend Technologies</b></h4>
-                    <ul>
-                        <li>flask micro-framework</li>
-                        <li>peewee orm library</li>
-                        <li>requests - http for humans</li>
-                        <li>beautifulsoup 4</li>
-                    </ul>
+                    <p>
+                        Source code available <a href="https://github.com/arlyon/hyperion-web">on github</a>.
+                    </p>
                 </DialogContainer>
                 <main>
                     <SearchBox regions={POSTCODES} alertValid={this.updatePostcode} online={this.state.online}/>
-                    {this.state.postcode ? <PostCodeData postcode={this.state.postcode}/> : null}
-                    {this.state.postcode ?
-                        <Card className="data">
-                            <TabsContainer
-                                panelClassName="md-grid"
-                                labelAndIcon={true}
-                                colored={true}
-                            >
-                                <Tabs tabId="simple-tab">
-                                    <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
-                                        <CrimeList postcode={this.state.postcode}/>
-                                    </Tab>
-                                    <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
-                                        <BikeList postcode={this.state.postcode}/>
-                                    </Tab>
-                                </Tabs>
-                            </TabsContainer>
-                        </Card> : null
-                    }
+                    <PostCodeData postcode={this.state.postcode}/>
                 </main>
                 <Snackbar
                     id="example"

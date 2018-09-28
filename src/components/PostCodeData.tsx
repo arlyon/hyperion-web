@@ -95,10 +95,34 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      */
     public render() {
         return (
-            <div id="postcodedata">
-                {this.state.address ? <LocalInfo address={this.state.address} nearby={this.state.nearby}/> : null}
-                {this.state.neighbourhood ? <PoliceInfo neighbourhood={this.state.neighbourhood}/> : null}
-            </div>
+            <section id="postcode-data">
+                <CSSTransition classNames={"open"} in={!!this.props.postcode && !!this.state.address} timeout={400}
+                               unmountOnExit={true}>
+                    <LocalInfo address={this.state.address!!} nearby={this.state.nearby}/>
+                </CSSTransition>
+                <CSSTransition classNames={"open"} in={!!this.props.postcode && !!this.state.neighbourhood}
+                               timeout={400} unmountOnExit={true}>
+                    <PoliceInfo neighbourhood={this.state.neighbourhood!!}/>
+                </CSSTransition>
+                <CSSTransition classNames={"open"} in={!!this.props.postcode} timeout={400} unmountOnExit={true}>
+                    <Card>
+                        <TabsContainer
+                            panelClassName="md-grid"
+                            labelAndIcon={true}
+                            colored={true}
+                        >
+                            <Tabs tabId="simple-tab">
+                                <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
+                                    <CrimeList postcode={this.props.postcode!}/>
+                                </Tab>
+                                <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
+                                    <BikeList postcode={this.props.postcode!}/>
+                                </Tab>
+                            </Tabs>
+                        </TabsContainer>
+                    </Card>
+                </CSSTransition>
+            </section>
         )
     }
 }
