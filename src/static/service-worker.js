@@ -11,7 +11,7 @@ const API_CACHE = 'crime-checker-fetch-v1';
  */
 const urlsToCache = [
     '/',
-    '/static/app.js',
+    '/app.js',
     'https://fonts.googleapis.com/icon?family=Material+Icons|Roboto:400,500,700',
     'https://unpkg.com/react-md@1/dist/react-md.deep_purple-pink.min.css',
     'https://unpkg.com/react@16/umd/react.production.min.js',
