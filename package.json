@@ -41,7 +41,7 @@
     "typescript": "^3.0.3",
     "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^4.20.2",
-    "webpack-dev-server": "^3.1.9",
+    "webpack-dev-server": "^3.1.11",
     "webpack-merge": "^4.1.1"
   },
   "dependencies": {
