@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 
-const API_URL = "https://hyperion-server.herokuapp.com";
+const API_URL = "https://api.crime.arlyon.dev";
 
 module.exports = merge(common, {
     entry: [
