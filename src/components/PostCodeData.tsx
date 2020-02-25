@@ -92,7 +92,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @returns {Promise<void>} Returns nothing.
      */
     private fetchBikes = async (postcode: string) => {
-        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/bikes/`);
+        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/bikes/1.6/`);
         this.setState({bikes: response.status == 200 ? await response.json() : []})
     };
 

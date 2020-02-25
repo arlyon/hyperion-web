@@ -54,16 +54,19 @@ export class BikeList extends React.Component<IBikeListProps, { search: string }
 
         return (
             this.props.bikes?.length ? (
-                <section className="bikecontainer">
+                <>
                     <TextField
                         id="bikefilter"
-                        placeholder="Filter..."
+                        placeholder={`Search ${this.props.bikes.length} bikes...`}
                         customSize="title"
                         value={this.state.search}
                         onChange={this.updateSearch}
+                        style={{margin: '2em'}}
                     />
-                    {bikeMarkUp ? bikeMarkUp : <MessageBox message="No Matching Bikes"/>}
-                </section>
+                    <section className="bikecontainer">
+                        {bikeMarkUp?.length ? bikeMarkUp : <MessageBox message="No Matching Bikes Thefts"/>}
+                    </section>
+                </>
             ) : <MessageBox message="No Thefts In Your Area"/>
         )
     }
@@ -75,34 +78,30 @@ export class BikeList extends React.Component<IBikeListProps, { search: string }
  * @returns {HTMLElement} The markup for the component.
  */
 function Bike(stolenBike: IBikeTheft) {
-    const propsNew = {} as IBikeTheft;
-    for (let x of Object.keys(stolenBike)) {
-        propsNew[x] = stolenBike[x] || "N/A"
-    }
     return (
-        <Card className="bikecard">
-            <CardTitle title={propsNew.model} subtitle={propsNew.make}/>
-            <CardText>
+        <article className="md-paper md-paper--1 bikecard">
+            <header>
+                <h2>{stolenBike.model}</h2>
+                <h3>{stolenBike.make}</h3>
+            </header>
+            <CardText style={{flexGrow: 1}}>
                 <p>
-                    <b>Latitude:</b> {propsNew.latitude}
+                    <b>Frame number: </b> {stolenBike.frame_number}
                 </p>
                 <p>
-                    <b>longitude: </b> {propsNew.longitude}
+                    <b>Colour: </b> {stolenBike.colour || "N/A"}
                 </p>
                 <p>
-                    <b>Frame number: </b> {propsNew.frame_number}
-                </p>
-                <p>
-                    <b>Colour: </b> {propsNew.colour}
-                </p>
-                <p>
-                    <b>Description: </b> {propsNew.description}
-                </p>
-                <p>
-                    <b>Reported at: </b> {propsNew.reported_at}
+                    <b>Description: </b> {stolenBike.description || "None"}
                 </p>
             </CardText>
-        </Card>
+            <footer>
+                <a href={`http://maps.google.com/maps?q=${stolenBike.latitude},${stolenBike.longitude}`}>
+                    <pre>{`[${stolenBike.latitude}, ${stolenBike.longitude}]`}</pre>
+                </a>
+                <p>{stolenBike.reported_at ? `Reported ${stolenBike.reported_at}` : <br/>}</p>
+            </footer>
+        </article>
     );
 }
 
