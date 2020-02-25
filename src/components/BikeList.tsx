@@ -4,45 +4,20 @@ import {IBikeTheft} from '../interfaces/BikeTheft'
 import {MessageBox} from "./Message";
 
 interface IBikeListProps {
-    postcode: string
+    bikes: IBikeTheft[] | null,
 }
 
 /**
  * Given a postcode, fetches a list of stolen bikes nearby.
  */
-export class BikeList extends React.Component <IBikeListProps, { bikes: any[], search: string }> {
+export class BikeList extends React.Component<IBikeListProps, { search: string }> {
 
     constructor(props: IBikeListProps) {
         super(props);
 
         this.state = {
-            bikes: [],
             search: "",
         };
-
-        if (this.props.postcode) {
-            this.fetchData(this.props.postcode);
-        }
-    }
-
-    /**
-     * Called when the component will receive new props and compares them
-     * with the old props to determine if more bikes should be fetched.
-     * @param next The next props from the server.
-     */
-    public componentWillReceiveProps(next: IBikeListProps) {
-        if (next.postcode !== this.props.postcode && next.postcode !== null) {
-            this.fetchData(next.postcode);
-        }
-    }
-
-    /**
-     * Fetches the data from the server and sets the received data in the state.
-     * @returns {Promise<void>} Returns nothing.
-     */
-    private async fetchData(postcode: string) {
-        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/bikes/`);
-        this.setState({bikes: response.status == 200 ? await response.json() : []})
     }
 
     /**
@@ -74,12 +49,11 @@ export class BikeList extends React.Component <IBikeListProps, { bikes: any[], s
             return false
         };
 
-        const bikeMarkUp = this.state.bikes
-            .filter(bikeFilter) //passes bike as parameter to function BikeFilter
+        const bikeMarkUp = this.props.bikes?.filter(bikeFilter)
             .map((stolenBike, index) => <Bike key={index} {...stolenBike} />);
 
         return (
-            this.state.bikes.length ? (
+            this.props.bikes ? (
                 <section className="bikecontainer">
                     <TextField
                         id="bikefilter"
@@ -88,7 +62,7 @@ export class BikeList extends React.Component <IBikeListProps, { bikes: any[], s
                         value={this.state.search}
                         onChange={this.updateSearch}
                     />
-                    {bikeMarkUp.length ? bikeMarkUp : <MessageBox message="No Matching Bikes"/>}
+                    {bikeMarkUp ? bikeMarkUp : <MessageBox message="No Matching Bikes"/>}
                 </section>
             ) : <MessageBox message="No Thefts In Your Area"/>
         )

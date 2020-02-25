@@ -9,7 +9,7 @@ import {
  */
 export interface ISearchProps {
     regions: { [prefix: string]: string };
-    updatePostcode: (postcode: string) => void;
+    updatePostcode: (postcode: string | null) => void;
     online: boolean;
 }
 
@@ -80,6 +80,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         searchString = searchString.toUpperCase();
 
         if (searchString.length == 0) {
+            this.props.updatePostcode(null);
             this.setState({
                 region: null,
                 searchString: "",
@@ -142,6 +143,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         }
         // otherwise show the autocomplete and tell the parent we no longer have a match
         else {
+            this.props.updatePostcode(null);
             this.setState({autoComplete});
         }
 

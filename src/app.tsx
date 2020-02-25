@@ -73,9 +73,8 @@ export class App extends React.Component<{}, IAppState> {
     /**
      * Passed into the search box and called to update the postcode.
      * @param postcode
-     * @param valid
      */
-    private updatePostcode = (postcode: string) => {
+    private updatePostcode = (postcode: string | null) => {
         this.setState({postcode,})
     };
 

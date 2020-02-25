@@ -3,62 +3,21 @@ import {DataTable, TableBody, TableColumn, TableHeader, TableRow,} from 'react-m
 import {MessageBox} from "./Message";
 import {CrimeData} from "../interfaces/Crime";
 
-/**
- * The state for the CrimeList component.
- */
-interface CrimeState {
-    crimes: CrimeData[]
-}
-
 interface ICrimeListProps {
-    postcode: string
+    crimes: CrimeData[] | null,
 }
 
 /**
  * Given a postcode, displays a list of crimes in the area.
  */
-export class CrimeList extends React.Component<ICrimeListProps, CrimeState> {
-    /**
-     * Instantiates a new instance of the CrimeList component.
-     * @param props The props.
-     */
-    constructor(props: ICrimeListProps) {
-        super(props);
-
-        this.state = {
-            crimes: []
-        };
-
-        if (this.props.postcode) {
-            this.fetchData(this.props.postcode)
-        }
-    }
-
-    /**
-     * Fetches new data if the postcode changes.
-     * @param props The next props.
-     */
-    public componentWillReceiveProps(props: ICrimeListProps) {
-        if (this.props.postcode !== props.postcode && props.postcode !== null) {
-            this.fetchData(props.postcode);
-        }
-    }
-
-    /**
-     * Fetches the data from the server and sets the received data in the state.
-     * @returns {Promise<void>} Returns nothing.
-     */
-    private async fetchData(postcode) {
-        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/crime/`);
-        this.setState({crimes: response.status == 200 ? await response.json() : []});
-    }
+export class CrimeList extends React.Component<ICrimeListProps> {
 
     /**
      * Counts occurrences of crimes and returns an object associating crimes to counts
      * @param crimes the list of crimes in that area
      * @returns {number[]} returns an array list of occurance of crimes in order specified
      */
-    private summarizeCategories(crimes: any[]) {
+    private summarizeCategories(crimes: CrimeData[]) {
         const data = {};
 
         crimes.forEach((crime) => {
@@ -88,15 +47,19 @@ export class CrimeList extends React.Component<ICrimeListProps, CrimeState> {
      * @returns {HTMLElement} The html for the component.
      */
     render() {
-        const listOfCrimes = this.summarizeCategories(this.state.crimes);
-        const crimeSummary = Object.keys(listOfCrimes).map((key, index) => (
-            <TableRow key={index}>
-                <TableColumn>{CrimeList.dehyphenate(key)}</TableColumn>
-                <TableColumn>{listOfCrimes[key]}</TableColumn>
-            </TableRow>
-        ));
+        let crimeSummary;
+        if (this.props.crimes) {
+            const crimeList = this.summarizeCategories(this.props.crimes);
+            crimeSummary = Object.keys(crimeList)
+                .map((key, index) => (
+                    <TableRow key={index}>
+                        <TableColumn>{CrimeList.dehyphenate(key)}</TableColumn>
+                        <TableColumn>{crimeList[key]}</TableColumn>
+                    </TableRow>
+                ));
+        }
 
-        if (crimeSummary.length) {
+        if (crimeSummary) {
             return (
                 <DataTable plain={true}>
                     <TableHeader>

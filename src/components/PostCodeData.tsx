@@ -1,12 +1,13 @@
 import * as React from "react";
 import {Button, Card, CardActions, CardText, CardTitle, FontIcon, List, Tab, Tabs, TabsContainer,} from "react-md";
 import {IAddress} from "../interfaces/Address";
+import {IBikeTheft} from "../interfaces/BikeTheft";
+import {CrimeData} from "../interfaces/Crime";
 import {INeighbourhood} from "../interfaces/Neighbourhood";
-import {Twitter} from "./Twitter";
-import {HyperLinkListItem} from "./HyperLinkListItem";
-import * as CSSTransition from "react-transition-group/CSSTransition";
-import {CrimeList} from "./CrimeList";
 import {BikeList} from "./BikeList";
+import {CrimeList} from "./CrimeList";
+import {HyperLinkListItem} from "./HyperLinkListItem";
+import {Twitter} from "./Twitter";
 
 /**
  * The props for postcode data.
@@ -19,9 +20,11 @@ export interface IPostCodeDataProps {
  * The state for the post code data props.
  */
 interface IPostCodeDataState {
-    nearby: any[],
+    nearby: any[] | null,
     neighbourhood: INeighbourhood | null,
-    address: IAddress | null
+    address: IAddress | null,
+    crimes: CrimeData[] | null,
+    bikes: IBikeTheft[] | null,
 }
 
 /**
@@ -35,15 +38,20 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      */
     constructor(props: IPostCodeDataProps) {
         super(props);
+
         this.state = {
-            nearby: [],
+            nearby: null,
             neighbourhood: null,
-            address: null
+            address: null,
+            crimes: null,
+            bikes: null,
         };
 
         if (this.props.postcode) {
             this.fetchNearbyLocations(this.props.postcode);
-            this.getLocalDataForPostcode(this.props.postcode);
+            this.fetchLocalDataForPostcode(this.props.postcode);
+            this.fetchBikes(this.props.postcode);
+            this.fetchCrimes(this.props.postcode);
         }
     }
 
@@ -52,18 +60,41 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @param next The new props.
      */
     public componentWillReceiveProps(next: IPostCodeDataProps) {
-        if (this.props.postcode === null && next.postcode !== null) {
+        if (next.postcode === null) {
             this.setState({
-                nearby: [],
+                nearby: null,
                 neighbourhood: null,
-                address: null
+                address: null,
+                bikes: null,
+                crimes: null,
             })
-        }
-        if (this.props.postcode !== next.postcode && next.postcode !== null) {
-            this.fetchNearbyLocations(next.postcode);
-            this.getLocalDataForPostcode(next.postcode);
+        } else {
+            if (this.props.postcode !== next.postcode) {
+                this.fetchNearbyLocations(next.postcode);
+                this.fetchLocalDataForPostcode(next.postcode);
+                this.fetchCrimes(next.postcode);
+                this.fetchBikes(next.postcode);
+            }
         }
     }
+
+    /**
+     * Fetches the data from the server and sets the received data in the state.
+     * @returns {Promise<void>} Returns nothing.
+     */
+    private fetchCrimes = async (postcode: string) => {
+        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/crime/`);
+        this.setState({crimes: response.status == 200 ? await response.json() : []});
+    };
+
+    /**
+     * Fetches the data from the server and sets the received data in the state.
+     * @returns {Promise<void>} Returns nothing.
+     */
+    private fetchBikes = async (postcode: string) => {
+        const response = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/bikes/`);
+        this.setState({bikes: response.status == 200 ? await response.json() : []})
+    };
 
     /**
      * Gets nearby locations from wikipedia and sets the state.
@@ -79,7 +110,7 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
      * @param {string} postcode The postcode to look up.
      * @returns {Promise<void>} Returns nothing.
      */
-    private getLocalDataForPostcode = async (postcode: string) => {
+    private fetchLocalDataForPostcode = async (postcode: string) => {
         const address_request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/`);
         const neighbourhood_request = await fetch(`${process.env.API_URL}/api/postcode/${postcode}/neighbourhood/`);
 
@@ -96,32 +127,25 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
     public render() {
         return (
             <section id="postcode-data">
-                <CSSTransition classNames={"open"} in={!!this.props.postcode && !!this.state.address} timeout={400}
-                               unmountOnExit={true}>
-                    <LocalInfo address={this.state.address!!} nearby={this.state.nearby}/>
-                </CSSTransition>
-                <CSSTransition classNames={"open"} in={!!this.props.postcode && !!this.state.neighbourhood}
-                               timeout={400} unmountOnExit={true}>
-                    <PoliceInfo neighbourhood={this.state.neighbourhood!!}/>
-                </CSSTransition>
-                <CSSTransition classNames={"open"} in={!!this.props.postcode} timeout={400} unmountOnExit={true}>
-                    <Card>
-                        <TabsContainer
-                            panelClassName="md-grid"
-                            labelAndIcon={true}
-                            colored={true}
-                        >
-                            <Tabs tabId="simple-tab">
-                                <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
-                                    <CrimeList postcode={this.props.postcode!}/>
-                                </Tab>
-                                <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
-                                    <BikeList postcode={this.props.postcode!}/>
-                                </Tab>
-                            </Tabs>
-                        </TabsContainer>
-                    </Card>
-                </CSSTransition>
+                {this.state.address && this.state.nearby ?
+                    <LocalInfo address={this.state.address} nearby={this.state.nearby}/> : null}
+                {this.state.neighbourhood ? <PoliceInfo neighbourhood={this.state.neighbourhood}/> : null}
+                {this.state.crimes || this.state.crimes ? <Card>
+                    <TabsContainer
+                        panelClassName="md-grid"
+                        labelAndIcon={true}
+                        colored={true}
+                    >
+                        <Tabs tabId="simple-tab">
+                            <Tab label="Local Crime" icon={<FontIcon>fingerprint</FontIcon>}>
+                                <CrimeList crimes={this.state.crimes}/>
+                            </Tab>
+                            <Tab label="Bike Crime" icon={<FontIcon>directions_bike</FontIcon>}>
+                                <BikeList bikes={this.state.bikes}/>
+                            </Tab>
+                        </Tabs>
+                    </TabsContainer>
+                </Card> : null}
             </section>
         )
     }
@@ -132,9 +156,9 @@ export class PostCodeData extends React.Component<IPostCodeDataProps, IPostCodeD
  * @param props The properties for the component.
  * @returns {HTMLElement} The markup for the component.
  */
-const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
+const LocalInfo = (props: { address: IAddress | null, nearby: any[] | null }) => {
 
-    const nearby = props.nearby.map((item, index) => (
+    const nearby = props.nearby?.map((item, index) => (
         <HyperLinkListItem
             key={index}
             primaryText={item.title}
@@ -147,8 +171,8 @@ const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
     return (
         <Card>
             <CardTitle
-                title={props.address.zone}
-                subtitle={props.address.district}
+                title={props.address?.zone}
+                subtitle={props.address?.district}
             />
             <CardActions
                 expander={props.nearby !== null}
@@ -156,12 +180,12 @@ const LocalInfo = (props: { address: IAddress, nearby: any[] }) => {
             >
                 <Button
                     flat={true}
-                    href={`http://maps.google.com/maps?q=${props.address.lat},${props.address.long}`}
+                    href={`http://maps.google.com/maps?q=${props.address?.lat},${props.address?.long}`}
                 >
                     View on Google Maps
                 </Button>
             </CardActions>
-            {props.nearby ? <CardText expandable={true}><List>{nearby}</List></CardText> : null}
+            {props.nearby ? <CardText expandable={true}><List>{nearby!}</List></CardText> : null}
         </Card>
     )
 };
