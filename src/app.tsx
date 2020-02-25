@@ -75,8 +75,8 @@ export class App extends React.Component<{}, IAppState> {
      * @param postcode
      * @param valid
      */
-    private updatePostcode = (postcode: string, valid: boolean) => {
-        this.setState({postcode: valid ? postcode : null})
+    private updatePostcode = (postcode: string) => {
+        this.setState({postcode,})
     };
 
     /**
@@ -124,7 +124,7 @@ export class App extends React.Component<{}, IAppState> {
             <div id="app">
                 <Toolbar
                     colored={true}
-                    title="Hyperion"
+                    title="UK Crime Lookup"
                     actions={<Button icon={true} onClick={this.showInfo}>info</Button>}
                     component="nav"
                     fixed={true}
@@ -153,7 +153,7 @@ export class App extends React.Component<{}, IAppState> {
                     </p>
                 </DialogContainer>
                 <main>
-                    <SearchBox regions={POSTCODES} alertValid={this.updatePostcode} online={this.state.online}/>
+                    <SearchBox regions={POSTCODES} updatePostcode={this.updatePostcode} online={this.state.online}/>
                     <PostCodeData postcode={this.state.postcode}/>
                 </main>
                 <Snackbar

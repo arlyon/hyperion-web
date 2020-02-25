@@ -9,7 +9,7 @@ import {
  */
 export interface ISearchProps {
     regions: { [prefix: string]: string };
-    alertValid: (postcode: string, valid: boolean) => void;
+    updatePostcode: (postcode: string) => void;
     online: boolean;
 }
 
@@ -80,7 +80,6 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         searchString = searchString.toUpperCase();
 
         if (searchString.length == 0) {
-            this.props.alertValid(searchString, false);
             this.setState({
                 region: null,
                 searchString: "",
@@ -109,7 +108,7 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
     private handleAutoComplete = (clickedValue: string) => {
         if (this.state.searchString !== clickedValue) {
             this.setState({searchString: clickedValue, autoComplete: [], error: false});
-            this.props.alertValid(clickedValue, true);
+            this.props.updatePostcode(clickedValue);
             localStorage.setItem("search", clickedValue);
         }
     };
@@ -139,12 +138,11 @@ export class SearchBox extends React.Component<ISearchProps, ISearchState> {
         // if there is one exact match, show no autocomplete and tell the parent we have a match
         if (autoComplete.length === 1 && searchString.replace(" ", "") === autoComplete[0].value.replace(" ", "")) {
             this.setState({autoComplete: []});
-            this.props.alertValid(postcodes[0], true);
+            this.props.updatePostcode(postcodes[0]);
         }
         // otherwise show the autocomplete and tell the parent we no longer have a match
         else {
-            this.setState({autoComplete,});
-            this.props.alertValid(searchString, false);
+            this.setState({autoComplete});
         }
 
         this.setError(postcodes.length === 0);

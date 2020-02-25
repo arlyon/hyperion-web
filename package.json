@@ -1,6 +1,6 @@
 {
-  "name": "Hyperion",
-  "version": "1.0.0",
+  "name": "hyperion",
+  "version": "1.0.1",
   "description": "Data about crime in the UK.",
   "main": "./front/app.ts",
   "scripts": {
