@@ -53,7 +53,7 @@ export class BikeList extends React.Component<IBikeListProps, { search: string }
             .map((stolenBike, index) => <Bike key={index} {...stolenBike} />);
 
         return (
-            this.props.bikes ? (
+            this.props.bikes?.length ? (
                 <section className="bikecontainer">
                     <TextField
                         id="bikefilter"

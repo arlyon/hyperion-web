@@ -185,7 +185,7 @@ const LocalInfo = (props: { address: IAddress | null, nearby: any[] | null }) =>
                     View on Google Maps
                 </Button>
             </CardActions>
-            {props.nearby ? <CardText expandable={true}><List>{nearby!}</List></CardText> : null}
+            {props.nearby?.length ? <CardText expandable={true}><List>{nearby!}</List></CardText> : null}
         </Card>
     )
 };

@@ -59,7 +59,7 @@ export class CrimeList extends React.Component<ICrimeListProps> {
                 ));
         }
 
-        if (crimeSummary) {
+        if (crimeSummary?.length) {
             return (
                 <DataTable plain={true}>
                     <TableHeader>
