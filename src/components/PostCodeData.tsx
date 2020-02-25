@@ -198,12 +198,12 @@ interface IPoliceInfoProps {
  * Displays information about a police neighbourhood.
  * @param props The props for the component.
  */
-class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
+class PoliceInfo extends React.Component<IPoliceInfoProps, { twitter: {user: any, tweets: any[]} | null }> {
     constructor(props: IPoliceInfoProps) {
         super(props);
 
         this.state = {
-            tweets: []
+            twitter: null
         };
 
         const twitter_handle = PoliceInfo.getHandle(this.props.neighbourhood.twitter);
@@ -216,7 +216,7 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
      */
     private async fetchData(twitterHandle: string) {
         const response = await fetch(`${process.env.API_URL}/api/twitter/${twitterHandle}/`);
-        this.setState({tweets: response.status == 200 ? await response.json() : []})
+        this.setState({twitter: response.status == 200 ? await response.json() : []})
     }
 
     /**
@@ -252,7 +252,7 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
     public componentWillReceiveProps(next: IPoliceInfoProps) {
         if (next.neighbourhood.twitter !== this.props.neighbourhood.twitter) {
             if (next.neighbourhood.twitter === null) {
-                this.setState({tweets: []})
+                this.setState({twitter: null})
             } else {
                 const twitter_handle = PoliceInfo.getHandle(next.neighbourhood.twitter);
                 if (twitter_handle) this.fetchData(twitter_handle);
@@ -288,10 +288,10 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
             <Button flat={true} href={`https://www.facebook.com/${facebook_handle}`}>facebook</Button> :
             null;
 
-        const twitter_feed = this.state.tweets.length ? (
+        const twitter_feed = this.state.twitter?.tweets.length ? (
             <section>
-                <h1 className="center bold">Recent Twitter Posts</h1>
-                <Twitter tweets={this.state.tweets}/>
+                <h3 className="center bold" style={{marginBottom: 0}}>Recent Tweets</h3>
+                <Twitter twitter={this.state.twitter}/>
             </section>
         ) : null;
 
@@ -303,7 +303,7 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
 
         const locations = locations_list.length ? (
             <section>
-                <h1 className="center bold">Local Police Locations</h1>
+                <h3 className="center bold">Local Police Locations</h3>
                 {locations_list}
             </section>
         ) : null;
@@ -314,7 +314,7 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
                 <CardTitle title="Local Police" subtitle={`${this.props.neighbourhood.name}`}/>
                 {description}
                 <CardActions
-                    expander={!!locations_list.length || !!this.state.tweets.length}
+                    expander={!!locations_list.length || !!this.state.twitter?.tweets.length}
                     className="md-divider-border md-divider-border--top md-divider-border--bottom"
                 >
                     {email_button}
@@ -324,6 +324,7 @@ class PoliceInfo extends React.Component<IPoliceInfoProps, { tweets: any[] }> {
                 </CardActions>
                 <CardText expandable={true}>
                     {twitter_feed}
+                    <hr style={{borderWidth: "0 0 1px 0", margin: "1em 0 1.5em 0", opacity: "0.2"}} />
                     {locations}
                 </CardText>
             </Card>
